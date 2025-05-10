@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+    
+    <h1>{{currentTournament}} 2025</h1>
+    <h2>Complete</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Round</th>
+                <th>Match</th>
+                <th>Predicted</th>
+                <th>Outcome</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pred in settled_predictions %}
+            <tr>
+                <td>{{ pred.match.round }}</td>
+                <td>{{ pred.match.player1 }} vs {{ pred.match.player2 }}</td>
+                <td>{{ pred.player }}</td>
+                <td>
+                    {% if pred.player == pred.match.winner %}
+                        + {{ pred.match.get_player_price(pred.player)}}
+                    {% else %}
+                        + 0
+                    {% endif %}
+                </td>
+            </tr>
+            {% if not loop.last %}
+            <tr>
+                <td colspan="4"><hr></td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+    
+    <h1>{{currentTournament}} 2025</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Position</th>
+                <th>User</th>
+                <th>Correct Predictions</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for userId, username, points, numCorrect in userResults %}
+            <tr>
+                {% if current_user.id == userId %}
+                    <td style="font-weight: bold;">{{ loop.index }}</td>
+                    <td style="font-weight: bold;">{{ username }}</td>
+                    <td style="font-weight: bold;">{{ numCorrect }}</td>
+                    <td style="font-weight: bold;">{{ points }}</td>
+                {% else %}
+                    <td>{{ loop.index }}</td>
+                    <td>{{ username }}</td>
+                    <td>{{ numCorrect }} </td>
+                    <td>{{ points }} </td>
+                {% endif %}
+            </tr>
+            {% if not loop.last %}
+            <tr>
+                <td colspan="4"><hr></td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

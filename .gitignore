@@ -1,0 +1,5 @@
+/app.db
+/migrations
+/output.json
+/venv
+/__pycache__
