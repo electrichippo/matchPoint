@@ -347,6 +347,8 @@ def success():
             filter(Match.tournament == tournament).\
             filter((Match.player1 == player1) | (Match.player2 == player1) | (Match.player1 == player2) | (Match.player2 == player2)).\
             count()
+
+            print(match_count)
             round_name = rounds[str(match_count)]
             winner = None
 
@@ -373,8 +375,8 @@ def success():
                 db.session.commit()
             else:
                 print(f"Match exists. Updating start time to: {start_time}")
-                # existing_match.startTime = start_time
-                # db.session.commit()
+                existing_match.startTime = start_time
+                db.session.commit()
 
     return redirect(url_for('index'))
          
