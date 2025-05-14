@@ -373,8 +373,8 @@ def success():
                 db.session.commit()
             else:
                 print(f"Match exists. Updating start time to: {start_time}")
-                existing_match.startTime = start_time
-                db.session.commit()
+                # existing_match.startTime = start_time
+                # db.session.commit()
 
     return redirect(url_for('index'))
          
