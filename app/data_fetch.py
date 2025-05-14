@@ -114,6 +114,8 @@ def get_match_data_for_tournament(competition_id, tournamentName):
             match_data_list = response.json().get('events', [])
             simplified_matches = []
             for match in match_data_list:
+                if match.get("isLive"):
+                    continue
                 match_info = {
                     "round": None,
                     "tournamentName": tournamentName,
@@ -157,6 +159,15 @@ def get_data(competition_id, tournamentName):
     all_matches = get_match_data_for_tournament(competition_id, tournamentName)
     return all_matches
 
+def get_json_data(competition_id, tournamentName):
+
+    all_matches = get_data(competition_id, tournamentName)
+
+    import json
+    with open("output.json", "w") as f:
+        json.dump(all_matches, f, indent=4)
+
+        
 if __name__ == "__main__":
     all_matches = get_data(172136, "ATP Rome")
 
