@@ -125,7 +125,7 @@ def user(username):
     # Predicitions on completed matches
     currentTournament = db.session.execute(
         sa.select(Match.tournament)
-        .order_by(asc(Match.startTime))
+        .order_by(desc(Match.startTime))
         .limit(1)
     ).scalar_one_or_none()
 
@@ -133,7 +133,7 @@ def user(username):
         .join(Match, Prediction.matchId == Match.id)\
         .filter(Match.winner != None)\
         .filter(Prediction.userId == user.id)\
-        .order_by(Match.startTime)\
+        .order_by(desc(Match.startTime))\
         .all()
     
     return render_template('user.html', title='History',settled_predictions = settled_predictions, currentTournament = currentTournament, user=user)
