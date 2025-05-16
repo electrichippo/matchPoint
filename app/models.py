@@ -40,6 +40,7 @@ class Match(db.Model):
     player1Price : so.Mapped[float] = so.mapped_column(index=True)
     player2 : so.Mapped[str] = so.mapped_column(sa.String(140))
     player2Price : so.Mapped[float] = so.mapped_column(index=True)
+    tour : so.Mapped[str] = so.mapped_column(sa.String(140), nullable=True)
     winner : so.Mapped[Optional[str]] = so.mapped_column(sa.String(140), nullable=True)
 
     predictions: so.WriteOnlyMapped['Prediction'] = so.relationship(

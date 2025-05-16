@@ -13,16 +13,16 @@
             </tr>
         </thead>
         <tbody>
-            {% for userId, username, points, numCorrect in userResults %}
+            {% for userId, username, points, numCorrect, predCount in userResults %}
             <tr>
                 {% if current_user.id == userId %}
                     <td style="font-weight: bold;">{{ loop.index }}</td>
-                    <td style="font-weight: bold;">{{ username }}</td>
+                    <td style="font-weight: bold;"><a href="{{ url_for('user', username=username) }}" >{{username}}</a></td>
                     <td style="font-weight: bold;">{{ numCorrect }}</td>
                     <td style="font-weight: bold;">{{ points }}</td>
                 {% else %}
                     <td>{{ loop.index }}</td>
-                    <td>{{ username }}</td>
+                    <td><a href="{{ url_for('user', username=username) }}">{{username}}</a></td>
                     <td>{{ numCorrect }} </td>
                     <td>{{ points }} </td>
                 {% endif %}

@@ -169,7 +169,14 @@ def get_json_data(competition_id, tournamentName):
 
         
 if __name__ == "__main__":
-    all_matches = get_data(172136, "ATP Rome")
+    all_matches = []
+    all_ATP_matches = get_data(172136, "ATP Rome")
+    all_WTA_matches = get_data(10747, "WTA Rome")
+
+    for match in all_ATP_matches:
+        all_matches.append(match)
+    # for match in all_WTA_matches:
+    #     all_matches.append(match)
 
     import csv
     import json

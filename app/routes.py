@@ -2,7 +2,7 @@ from urllib.parse import urlsplit
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_user, logout_user, current_user, login_required
 import sqlalchemy as sa
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, select, asc
 import json
 import random
 import datetime
@@ -96,24 +96,47 @@ def index():
 
     return render_template('index.html', title='Home', matches = unpredicted_matches, upcoming_predictions = upcoming_predictions, radio_groups=prediction_array, currentTournament=curentTournament)
 
-@app.route('/history', methods=['GET', 'POST'])
+# Replaced with user profiles
+
+# @app.route('/history', methods=['GET', 'POST'])
+# @login_required
+# def history():
+# # Predicitions on completed matches
+#     currentTournament = db.session.execute(
+#         sa.select(Match.tournament)
+#         .order_by(asc(Match.startTime))
+#         .limit(1)
+#     ).scalar_one_or_none()
+
+#     settled_predictions = Prediction.query\
+#         .join(Match, Prediction.matchId == Match.id)\
+#         .filter(Match.winner != None)\
+#         .filter(Prediction.userId == current_user.id)\
+#         .order_by(Match.startTime)\
+#         .all()
+    
+#     return render_template('history.html', title='History',settled_predictions = settled_predictions, currentTournament = currentTournament)
+
+@app.route('/user/<username>')
 @login_required
-def history():
-# Predicitions on completed matches
+def user(username):
+    user = db.first_or_404(sa.select(User).where(User.username == username))
+
+    # Predicitions on completed matches
     currentTournament = db.session.execute(
         sa.select(Match.tournament)
-        .order_by(desc(Match.id))
+        .order_by(asc(Match.startTime))
         .limit(1)
     ).scalar_one_or_none()
 
     settled_predictions = Prediction.query\
         .join(Match, Prediction.matchId == Match.id)\
         .filter(Match.winner != None)\
-        .filter(Prediction.userId == current_user.id)\
+        .filter(Prediction.userId == user.id)\
         .order_by(Match.startTime)\
         .all()
     
-    return render_template('history.html', title='History',settled_predictions = settled_predictions, currentTournament = currentTournament)
+    return render_template('user.html', title='History',settled_predictions = settled_predictions, currentTournament = currentTournament, user=user)
 
 @app.route('/leaderboard', methods=['GET', 'POST'])
 @login_required
@@ -133,9 +156,9 @@ def leaderboard():
                  sa.case(
                      (Prediction.player == Match.player1, Match.player1Price),
                      (Prediction.player == Match.player2, Match.player2Price),
-                     else_= 0
+                     else_=0
                  )),
-                else_= 0
+                else_=0
             )
         ), 0).label('total_points'),
         func.coalesce(func.sum(
@@ -143,13 +166,14 @@ def leaderboard():
                 (Prediction.player == Match.winner, 1),
                 else_=0
             )
-        ), 0).label('correct_predictions_count')
-    ).join(Prediction, User.id == Prediction.userId, isouter=True)\
-     .join(Match, Prediction.matchId == Match.id, isouter=True)\
-     .filter(Match.tournament == curentTournament)\
-     .group_by(User.id, User.username)\
-     .order_by(desc('total_points'))\
-     .all()
+        ), 0).label('correct_predictions_count'),
+        func.coalesce(func.count(Prediction.id), 0).label('total_predictions_count')
+    ).join(Prediction, User.id == Prediction.userId, isouter=True).\
+        join(Match, Prediction.matchId == Match.id, isouter=True).\
+        filter(Match.tournament == curentTournament).\
+        group_by(User.id, User.username).\
+        order_by(desc('total_points')).\
+        all()
     
     return render_template('leaderboard.html', title='Leaderboard', userResults = user_results, currentTournament = curentTournament)
 
@@ -326,7 +350,7 @@ def upload():
 
 @app.route('/success', methods = ['POST'])   
 def success():
-    rounds = {'0':"R1", '1':"R2", '2' : "R3", '3' : "R4", '4':"QF", '5':"SF", '6':"F"}
+    rounds = ["R1", "R2", "R3", "R4", "QF", "SF", "F"]
     if request.method == 'POST':   
         f = request.files['file'] 
         f.save(f.filename)
@@ -339,17 +363,28 @@ def success():
             start_time = datetime.datetime.strptime(match['startsAt'], '%Y-%m-%d %H:%M:%S')
             player1_price = round(match['homeTeamPrice'] * 100)
             player2_price = round(100*(1/(1 - (1/(player1_price/100)))))
+            if "ATP" in match['tournamentName']: tour = "WTA"
+            else: tour = "ATP"
             tournament = match['tournamentName'].replace("WTA", "", 1).replace("ATP", "", 1)
 
-            print(tournament)
+            match_count_player2 = db.session.execute(select(func.count(Match.id)).\
+                                                    where(Match.tournament == tournament).\
+                                                    where((Match.player1 == player2) | (Match.player2 == player2))).\
+                                                    scalar_one()
 
-            match_count = db.session.query(Match).\
-            filter(Match.tournament == tournament).\
-            filter((Match.player1 == player1) | (Match.player2 == player1) | (Match.player1 == player2) | (Match.player2 == player2)).\
-            count()
+            match_count_player1 = db.session.execute(select(func.count(Match.id)).\
+                                                    where(Match.tournament == tournament).\
+                                                    where((Match.player1 == player1) | (Match.player2 == player1))).\
+                                                    scalar_one()
 
-            print(match_count)
-            round_name = rounds[str(match_count)]
+            if match_count_player1 > match_count_player2: matchCount = match_count_player1
+            else: matchCount = match_count_player2
+
+            try:
+                round_name = rounds[matchCount]
+            except:
+                round_name = ""
+            
             winner = None
 
             existing_match = db.session.query(Match).\
@@ -369,6 +404,7 @@ def success():
                     player1Price=player1_price,
                     player2=player2,
                     player2Price=player2_price,
+                    tour = tour,
                     winner=winner
                 )
                 db.session.add(match)
