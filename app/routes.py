@@ -133,6 +133,7 @@ def user(username):
         .join(Match, Prediction.matchId == Match.id)\
         .filter(Match.winner != None)\
         .filter(Prediction.userId == user.id)\
+        .filter(Match.tournament == currentTournament)\
         .order_by(desc(Match.startTime))\
         .all()
     
