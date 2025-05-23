@@ -56,7 +56,7 @@ def index():
         data = {
             'name' : f"{match.id}",
             'label' : f"{match.round} - {match.player1} vs {match.player2}: {match.startTime.strftime('%a %I:%M %p')}",
-            'options' : [(f"{match.player1}", f"{match.player1} @ {match.player1Price}"), (f"{match.player2}", f"{match.player2} @ {match.player2Price}")]
+            'options' : [(f"{match.player1}", f"{match.player1} | {match.player1Price}"), (f"{match.player2}", f"{match.player2} | {match.player2Price}")]
         }
         prediction_array.append(data)  
       
@@ -346,7 +346,7 @@ def assignm():
 
 @app.route('/upload')   
 def upload():   
-    return render_template("upload.html")  
+    return render_template("upload.html") 
 
 @app.route('/success', methods = ['POST'])   
 def success():
@@ -361,11 +361,12 @@ def success():
             player1 = match['homeTeam']
             player2 = match['awayTeam']
             start_time = datetime.datetime.strptime(match['startsAt'], '%Y-%m-%d %H:%M:%S')
-            player1_price = round(match['homeTeamPrice'] * 100)
-            player2_price = round(100*(1/(1 - (1/(player1_price/100)))))
-            if "ATP" in match['tournamentName']: tour = "WTA"
-            else: tour = "ATP"
-            tournament = match['tournamentName'].replace("WTA", "", 1).replace("ATP", "", 1)
+
+            if "ATP" in match['tournamentName'] or "Men's" in match['tournamentName']: 
+                tour = "ATP"
+            else: 
+                tour = "WTA"
+            tournament = match['tournamentName'].replace("WTA", "", 1).replace("ATP", "", 1).replace("Men's", "", 1).replace("Women's", "", 1).strip()
 
             match_count_player2 = db.session.execute(select(func.count(Match.id)).\
                                                     where(Match.tournament == tournament).\
@@ -385,6 +386,9 @@ def success():
             except:
                 round_name = ""
             
+            player1_price = round(10 * match['homeTeamPrice'] * 2**float(matchCount), 1)
+            player2_price = round(10 * match['awayTeamPrice'] * 2**float(matchCount), 1)
+
             winner = None
 
             existing_match = db.session.query(Match).\
@@ -395,17 +399,41 @@ def success():
                 ).\
                 first()
             
+            # Update winners for player1           
+            players_matches = Match.query.\
+                    filter(Match.tournament == tournament).\
+                    filter(((Match.player1 == player1) | (Match.player2 == player1))).\
+                    filter(Match.winner == None).\
+                    all()
+                
+            for match in players_matches:
+                if not (match.player1 == player1 and match.player2 == player2) or (match.player1 == player2 and match.player2 == player1):
+                    match.winner = player1
+            
+            # Update winners for player2
+            players_matches = Match.query.\
+                    filter(Match.tournament == tournament).\
+                    filter(((Match.player1 == player2) | (Match.player2 == player2))).\
+                    filter(Match.winner == None).\
+                    all()
+                
+            for match in players_matches:
+                if not (match.player1 == player1 and match.player2 == player2) or (match.player1 == player2 and match.player2 == player1):
+                    match.winner = player2
+    
+            db.session.commit()
+            
             if not existing_match:
                 match = Match(
-                    tournament=tournament,
-                    round=round_name,
-                    startTime=start_time,
-                    player1=player1,
-                    player1Price=player1_price,
-                    player2=player2,
-                    player2Price=player2_price,
+                    tournament = tournament,
+                    round = round_name,
+                    startTime = start_time,
+                    player1 = player1,
+                    player1Price = player1_price,
+                    player2 = player2,
+                    player2Price = player2_price,
                     tour = tour,
-                    winner=winner
+                    winner = winner
                 )
                 db.session.add(match)
                 db.session.commit()
@@ -413,7 +441,7 @@ def success():
                 print(f"Match exists. Updating start time to: {start_time}")
                 existing_match.startTime = start_time
                 db.session.commit()
-
+            
     return redirect(url_for('index'))
          
         
@@ -444,8 +472,6 @@ def admin():
             option['player'] = request.form.get(group['name'])
             options.append(option)
     
-        # CREATE PREDICTIONS HERE
-        # Get user
         user = db.session.scalar(sa.select(User).\
                                     where(User.id == current_user.id))
         for option in options:
