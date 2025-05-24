@@ -387,8 +387,8 @@ def success():
             except:
                 round_name = ""
             
-            player1_price = round(10 * match['homeTeamPrice'] * 2**float(matchCount), 1)
-            player2_price = round(10 * match['awayTeamPrice'] * 2**float(matchCount), 1)
+            player1_price = round(10.0 * match['homeTeamPrice'] * 2**float(matchCount), 1)
+            player2_price = round(10.0 * match['awayTeamPrice'] * 2**float(matchCount), 1)
 
             winner = None
 

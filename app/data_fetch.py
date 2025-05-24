@@ -131,18 +131,21 @@ def get_match_data_for_tournament(competition_id, tournamentName):
                         "awayTeamPrice": None,
                         "winner": None
                     }
-                    for market in match.get("fixedOddsMarkets", []):
-                        if market.get("eventName") == "Match Result":
-                            i = 0
-                            for outcome in market.get("outcomes", []):
-                                if i == 0:
-                                    match_info["homeTeamPrice"] = outcome.get("price")
-                                    i+=1
-                                else:
-                                    match_info["awayTeamPrice"] = outcome.get("price")
+                    # for market in match.get("fixedOddsMarkets", []):
+                    #     if market.get("eventName") == "Match Result":
+                    #         i = 0
+                    #         for outcome in market.get("outcomes", []):
+                    #             if i == 0:
+                    #                 match_info["homeTeamPrice"] = outcome.get("price")
+                    #                 i+=1
+                    #             else:
+                    #                 match_info["awayTeamPrice"] = outcome.get("price")
                                 
 
-                            break # Once "Match Result" is found, no need to check other markets
+                    #         break # Once "Match Result" is found, no need to check other markets
+
+                    match_info['homeTeamPrice'] = match['fixedOddsMarkets'][0]["outcomes"][0]["price"]
+                    match_info['awayTeamPrice'] = match['fixedOddsMarkets'][0]["outcomes"][1]["price"]
 
                     simplified_matches.append(match_info)
 
