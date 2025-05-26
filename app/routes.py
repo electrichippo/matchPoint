@@ -369,7 +369,7 @@ def success():
                 tour = "WTA"
             tournament = match['tournamentName'].replace("WTA", "", 1).replace("ATP", "", 1).replace("Men's", "", 1).replace("Women's", "", 1).strip()
 
-            match_count_player2 = db.session.execute(select(func.count(Match.id)).\
+            match_count_player2 = db.session.execute(sa.select(sa.func.count(Match.id)).\
                                                     where(Match.tournament == tournament).\
                                                     where((Match.player1 == player2) | (Match.player2 == player2))).\
                                                     scalar_one()
@@ -491,6 +491,31 @@ def admin():
         return redirect(url_for('admin'))
     
     return render_template('admin.html', title='Admin', radio_groups = match_array)
+
+    # match = db.session.scalar(sa.select(Match).\
+    #                           where(Match.tournament == tournament_name)
+    #                 sa.and_(Match.player1 == player1, Match.player2 == player2)
+    #             )
+    
+    # m = Match.query.\
+    #         where(Match.tournament == tournament).\
+    #         where((Match.player1 == player) | (Match.player2 == player)).\
+    #         first()
+
+    # u = User.query.\
+    #     where(User.username == "ben.ganko").\
+    #     first()
+    
+    # for m in matches:
+    #     print(m)
+    
+    # predictions_to_delete = db.session.scalars(
+    #     sa.select(Prediction).where(Prediction.matchId == 36)
+    # ).all()
+
+    # for p in predictions_to_delete:
+    #     print(p)
+    #     db.session.delete(p)
     
     
 

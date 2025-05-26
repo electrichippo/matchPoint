@@ -19,12 +19,12 @@
                     <td style="font-weight: bold;">{{ loop.index }}</td>
                     <td style="font-weight: bold;"><a href="{{ url_for('user', username=username) }}" >{{username}}</a></td>
                     <td style="font-weight: bold;">{{ numCorrect }}</td>
-                    <td style="font-weight: bold;">{{ points }}</td>
+                    <td style="font-weight: bold;">{{ points|round(1)}}</td>
                 {% else %}
                     <td>{{ loop.index }}</td>
                     <td><a href="{{ url_for('user', username=username) }}">{{username}}</a></td>
                     <td>{{ numCorrect }} </td>
-                    <td>{{ points }} </td>
+                    <td>{{ points|round(1) }} </td>
                 {% endif %}
             </tr>
             {% if not loop.last %}
