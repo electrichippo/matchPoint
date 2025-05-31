@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<table>
+    <h2>{{ match.round }} - {{ match.player1 }} vs {{ match.player2 }}</h2>
+    <thead>
+        <tr>
+            <th>{{ match.player1 }} | {{ match.player1Price }}</th>
+            <th>{{ match.player2 }} | {{ match.player2Price }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in predictions %}
+        <tr>
+            <td> 
+                {% if p.player == match.player1 %}
+                    {% if current_user.id == p.maker.id %}
+                        <a href="{{ url_for('user', username=p.maker.username) }}" ><strong>{{p.maker.username}}</strong></a>
+                    {% else %}
+                        <a href="{{ url_for('user', username=p.maker.username) }}" >{{p.maker.username}}</a>
+                    {% endif %}
+                {% else %}
+                    {{ " " }}
+                {% endif %}
+            </td>
+            <td>
+                {% if p.player == match.player2 %}
+                    {% if current_user.id == p.maker.id %}
+                        <a href="{{ url_for('user', username=p.maker.username) }}" ><strong>{{p.maker.username}}</strong></a>
+                    {% else %}
+                        <a href="{{ url_for('user', username=p.maker.username) }}" >{{p.maker.username}}</a>
+                    {% endif %}
+                {% else %}
+                    {{ " " }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

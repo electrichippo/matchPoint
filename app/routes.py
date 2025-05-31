@@ -137,7 +137,38 @@ def user(username):
         .order_by(desc(Match.startTime))\
         .all()
     
-    return render_template('user.html', title='History',settled_predictions = settled_predictions, currentTournament = currentTournament, user=user)
+    return render_template('user.html', title='User',settled_predictions = settled_predictions, currentTournament = currentTournament, user=user)
+
+@app.route('/match/<match_name>')
+@login_required
+def match(match_name):
+    # user = db.first_or_404(sa.select(User).where(User.username == username))
+    currentTournament = db.session.execute(
+        sa.select(Match.tournament)
+        .order_by(desc(Match.startTime))
+        .limit(1)
+    ).scalar_one_or_none()
+
+    # Split by the VS so that it works even for 2+ word names
+    match_fields = match_name.split(" vs ")
+    player1 = match_fields[0]
+    player2 = match_fields[1]
+
+    match = Match.query\
+        .where(Match.tournament == currentTournament)\
+        .where(Match.player1 == player1)\
+        .where(Match.player2 == player2)\
+        .first()
+    
+    predictions = db.session.scalars(
+    sa.select(Prediction).where(Prediction.matchId == match.id)
+        ).all()
+    
+    for p in predictions:
+        print(f"user: {p.maker.username} predicted: {p.player}")
+    
+    return render_template('match_view.html', title='History', match = match, predictions = predictions)
+
 
 @app.route('/leaderboard', methods=['GET', 'POST'])
 @login_required
@@ -491,31 +522,6 @@ def admin():
         return redirect(url_for('admin'))
     
     return render_template('admin.html', title='Admin', radio_groups = match_array)
-
-    # match = db.session.scalar(sa.select(Match).\
-    #                           where(Match.tournament == tournament_name)
-    #                 sa.and_(Match.player1 == player1, Match.player2 == player2)
-    #             )
-    
-    # m = Match.query.\
-    #         where(Match.tournament == tournament).\
-    #         where((Match.player1 == player) | (Match.player2 == player)).\
-    #         first()
-
-    # u = User.query.\
-    #     where(User.username == "ben.ganko").\
-    #     first()
-    
-    # for m in matches:
-    #     print(m)
-    
-    # predictions_to_delete = db.session.scalars(
-    #     sa.select(Prediction).where(Prediction.matchId == 36)
-    # ).all()
-
-    # for p in predictions_to_delete:
-    #     print(p)
-    #     db.session.delete(p)
     
     
 
