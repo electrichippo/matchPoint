@@ -8,25 +8,34 @@
 
 .filter-buttons > div {
     display: flex;
-    gap: 5px; /* Excellent for spacing between buttons */
+    gap: 5px;
 }
 
 .filter-btn {
-    /* REMOVE 'width' property */
-    display: inline-block; /* Or keep it as a flex item, which 'display:flex' on parent handles */
-    padding: 8px 12px; /* Control size primarily with padding */
-    /* REMOVE margin-right, as 'gap' on parent handles spacing */
+    display: flex; /* Make it a flex container to center its content */
+    justify-content: center; /* Horizontally center content */
+    align-items: center; /* Vertically center content */
+
+    /* The magic for squares: */
+    aspect-ratio: 1 / 1; /* Makes the width and height maintain a 1:1 ratio */
+    
+    /* Control the overall size primarily via width OR height.
+       Since we're in a flex container, let's give it a reasonable base width. */
+    width: 40px; /* Adjust this base width as needed for your desired square size */
+
+    padding: 0; /* Remove internal padding, as flexbox and content will size it.
+                  If your content has a fixed size (e.g. a single digit), this works.
+                  If the content can vary, you might need min-width/min-height or
+                  re-evaluate if pure squares are always best. */
+    
     text-decoration: none;
     border: 1px solid #ccc;
     border-radius: 4px;
     background-color: #f8f9fa;
     color: #333;
     transition: all 0.2s;
-    text-align: center; /* Still good for horizontal alignment of content */
-    /* Optional: Set a min-width if you want a base size, but padding is usually enough */
-    /* min-width: 20px; */
-    font-size: 1em; /* Start with a base font size */
-    box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+    font-size: 1em; /* Base font size */
+    box-sizing: border-box; /* Good practice */
 }
 
 .filter-btn:hover {
@@ -53,6 +62,7 @@
         /* Instead of fixed width, adjust padding or font-size */
         padding: 6px 8px; /* Slightly less padding */
         font-size: 0.9em; /* Smaller font size */
+        width: 30px; 
     }
 }
 
@@ -61,6 +71,7 @@
         /* Even less padding and smaller font size for very small screens */
         padding: 4px 6px;
         font-size: 0.8em;
+        width: 30px; 
     }
     .filter-buttons > div {
         gap: 3px; /* Reduce gap between buttons for very small screens */
