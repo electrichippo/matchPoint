@@ -8,6 +8,7 @@
     background-color: #f0fff0; /* Very light green, like a court */
     color: #333;
     line-height: 1.6;
+    font-size: 16px; /* Base font size for desktop */
 }
 
 .container {
@@ -20,7 +21,7 @@
 }
 
 /* =============================================================================
-   NAVIGATION
+   NAVIGATION - RESPONSIVE FONT SIZES
    ============================================================================= */
 
 nav {
@@ -36,6 +37,7 @@ nav a {
     color: white;
     text-decoration: none;
     padding: 0.7rem 1.5rem;
+    font-size: 1.2rem; /* Default size for large screens */
     margin: 0 0.5rem;
     border-radius: 5px;
     transition: background-color 0.3s ease;
@@ -294,35 +296,179 @@ hr {
     color: red;
 }
 
-img {
-    border-radius: 50%;
-}
-
 /* =============================================================================
-   RESPONSIVE DESIGN
+   RESPONSIVE DESIGN - MOBILE OPTIMIZATION
    ============================================================================= */
 
-@media (max-width: 768px) {
+/* Tablet styles (768px and below) */
+@media screen and (max-width: 768px) {
+    body {
+        font-size: 13px;
+    }
+    
     .container {
-        margin: 1rem;
-        padding: 1rem;
+        margin: 0.8rem;
+        padding: 0.8rem;
     }
     
     nav a {
-        padding: 0.5rem 1rem;
-        margin: 0 0.25rem;
         font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+        margin: 0 0.2rem;
     }
     
-    .option-grid {
-        grid-template-columns: 1fr;
+    h1 {
+        font-size: 1.6rem;
     }
     
-    table {
-        font-size: 0.9rem;
+    h2 {
+        font-size: 1.2rem;
+        margin-top: 1.2rem;
+    }
+    
+    form {
+        padding: 0.8rem;
     }
     
     th, td {
+        padding: 0.5rem 0.6rem;
+        font-size: 0.8rem;
+    }
+    
+    .match-table th {
+        font-size: 0.9rem;
+        padding: 0.6rem;
+    }
+    
+    .option-tile label {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Mobile styles (480px and below) */
+@media screen and (max-width: 480px) {
+    body {
+        font-size: 11px;
+    }
+    
+    .container {
+        margin: 0.3rem;
+        padding: 0.5rem;
+    }
+    
+    nav {
+        padding: 0.6rem 0;
+    }
+    
+    nav a {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.4rem;
+        margin: 0 0.05rem;
+        display: inline-block;
+    }
+    
+    h1 {
+        font-size: 1.2rem;
+        margin-bottom: 0.6rem;
+    }
+    
+    h2 {
+        font-size: 1rem;
+        margin-top: 1rem;
+    }
+    
+    form {
+        padding: 0.5rem;
+    }
+    
+    form p {
+        font-size: 0.8rem;
+    }
+    
+    input[type="text"], 
+    input[type="email"], 
+    input[type="password"] {
+        padding: 0.4rem;
+        font-size: 0.8rem;
+    }
+    
+    button[type="submit"], 
+    input[type="submit"] {
         padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+    }
+    
+    .messages {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    table {
+        font-size: 0.7rem;
+    }
+    
+    th, td {
+        padding: 0.3rem 0.4rem;
+    }
+    
+    .match-table th {
+        font-size: 0.7rem;
+        padding: 0.4rem;
+    }
+    
+    .match-table td {
+        padding: 0.2rem;
+    }
+    
+    .option-grid {
+        gap: 0.2rem;
+    }
+    
+    .option-tile label {
+        padding: 0.3rem;
+        font-size: 0.7rem;
+    }
+    
+    .prediction-group {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Extra small mobile styles (360px and below) */
+@media screen and (max-width: 360px) {
+    body {
+        font-size: 10px;
+    }
+    
+    .container {
+        margin: 0.1rem;
+        padding: 0.4rem;
+    }
+    
+    nav a {
+        font-size: 0.6rem;
+        padding: 0.25rem 0.3rem;
+    }
+    
+    h1 {
+        font-size: 1rem;
+    }
+    
+    h2 {
+        font-size: 0.9rem;
+    }
+    
+    table {
+        font-size: 0.6rem;
+    }
+    
+    th, td {
+        padding: 0.2rem 0.3rem;
+    }
+    
+    .option-tile label {
+        padding: 0.25rem;
+        font-size: 0.6rem;
     }
 }

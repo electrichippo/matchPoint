@@ -2,8 +2,6 @@
 /migrations
 /output.json
 /venv
+app/__pycache__
 /__pycache__
-test_jsons/f.json
-f.json
-sf.json
-r4.json
+/test_jsons

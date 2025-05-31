@@ -2,46 +2,70 @@
 
 {% block page_styles %}
 <style>
-    .filter-buttons {
+.filter-buttons {
     margin-bottom: 20px;
-    }
+}
 
-    .filter-buttons > div {
+.filter-buttons > div {
     display: flex;
-    gap: 5px;
-    }
+    gap: 5px; /* Excellent for spacing between buttons */
+}
 
+.filter-btn {
+    /* REMOVE 'width' property */
+    display: inline-block; /* Or keep it as a flex item, which 'display:flex' on parent handles */
+    padding: 8px 12px; /* Control size primarily with padding */
+    /* REMOVE margin-right, as 'gap' on parent handles spacing */
+    text-decoration: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    color: #333;
+    transition: all 0.2s;
+    text-align: center; /* Still good for horizontal alignment of content */
+    /* Optional: Set a min-width if you want a base size, but padding is usually enough */
+    /* min-width: 20px; */
+    font-size: 1em; /* Start with a base font size */
+    box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+}
+
+.filter-btn:hover {
+    background-color: #e9ecef;
+    text-decoration: none;
+}
+
+.filter-btn.active {
+    background-color: #5cb85c;
+    color: white;
+    border-color: #4cae4c;
+}
+
+.current-filter {
+    margin-top: 10px;
+    font-style: italic;
+    color: #666;
+    font-size: 0.9em;
+}
+
+/* --- Media Queries --- */
+@media screen and (max-width: 480px) {
     .filter-btn {
-        display: inline-block;
-        padding: 8px 12px;
-        margin-right: 5px;
-        text-decoration: none;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        background-color: #f8f9fa;
-        color: #333;
-        transition: all 0.2s;
-        width: 20px; /* Fixed width - adjust as needed */
-        text-align: center;
+        /* Instead of fixed width, adjust padding or font-size */
+        padding: 6px 8px; /* Slightly less padding */
+        font-size: 0.9em; /* Smaller font size */
     }
+}
 
-    .filter-btn:hover {
-        background-color: #e9ecef;
-        text-decoration: none;
+@media screen and (max-width: 360px) {
+    .filter-btn {
+        /* Even less padding and smaller font size for very small screens */
+        padding: 4px 6px;
+        font-size: 0.8em;
     }
-
-    .filter-btn.active {
-        background-color: #5cb85c;
-        color: white;
-        border-color: #4cae4c;
+    .filter-buttons > div {
+        gap: 3px; /* Reduce gap between buttons for very small screens */
     }
-
-    .current-filter {
-        margin-top: 10px;
-        font-style: italic;
-        color: #666;
-        font-size: 0.9em;
-    }
+}
 </style>
 
 {% endblock %}
