@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-
 {% if user != current_user %}
     <h1>{{user.username}}'s Prediction History</h1>
 {% endif %}
@@ -10,37 +9,37 @@
 {% endif %}
 
 <h2>{{currentTournament}} 2025</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Round</th>
-                <th>Match</th>
-                <th>Predicted</th>
-                <th>Outcome</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for pred in settled_predictions %}
-            <tr>
-                <td>{{ pred.match.round }}</td>
-                {% set matchup = pred.match.player1 ~ ' vs ' ~ pred.match.player2 %}
-                <td><a href="{{ url_for('match', match_name=matchup) }}" >{{ pred.match.player1 }} vs {{ pred.match.player2 }}</a></td>
-                <td>{{ pred.player }}</td>
-                <td>
-                    {% if pred.player == pred.match.winner %}
-                        + {{ pred.match.get_player_price(pred.player)}}
-                    {% else %}
-                        + 0
-                    {% endif %}
-                </td>
-            </tr>
-            {% if not loop.last %}
-            <tr>
-                <td colspan="4"><hr></td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-        </tbody>
-    </table>
+<table>
+    <thead>
+        <tr>
+            <th>Round</th>
+            <th>Match</th>
+            <th>Predicted</th>
+            <th>Outcome</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pred in settled_predictions %}
+        <tr>
+            <td>{{ pred.match.round }}</td>
+            {% set matchup = pred.match.player1 ~ ' vs ' ~ pred.match.player2 %}
+            <td><a href="{{ url_for('match', match_name=matchup) }}">{{ pred.match.player1 }} vs {{ pred.match.player2 }}</a></td>
+            <td>{{ pred.player }}</td>
+            <td>
+                {% if pred.player == pred.match.winner %}
+                    + {{ pred.match.get_player_price(pred.player)}}
+                {% else %}
+                    + 0
+                {% endif %}
+            </td>
+        </tr>
+        {% if not loop.last %}
+        <tr>
+            <td colspan="4"><hr></td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
 
 {% endblock %}

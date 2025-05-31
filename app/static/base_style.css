@@ -1,36 +1,13 @@
-body {
+/* =============================================================================
+   BASE STYLES & LAYOUT
+   ============================================================================= */
+
+   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     background-color: #f0fff0; /* Very light green, like a court */
     color: #333;
     line-height: 1.6;
-}
-
-nav {
-    background-color: #4CAF50; /* Tennis ball green */
-    color: white;
-    padding: 1rem 0;
-    text-align: center; /* Center the navigation links */
-    border-bottom: 2px solid #8BC34A;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-nav a {
-    color: white;
-    text-decoration: none;
-    padding: 0.7rem 1.5rem; /* More horizontal padding */
-    margin: 0 0.5rem;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-    font-weight: bold; /* Make navigation links stand out */
-}
-
-nav a:hover {
-    background-color: #66BB6A;
-}
-
-nav span {
-    display: none; /* Hide the title in the centered nav */
 }
 
 .container {
@@ -42,11 +19,68 @@ nav span {
     border-radius: 8px;
 }
 
-hr {
-    border: none;
-    border-top: 2px solid #4CAF50; /* Use the green color for the separator */
-    margin: 1.5rem 0; /* More vertical margin */
+/* =============================================================================
+   NAVIGATION
+   ============================================================================= */
+
+nav {
+    background-color: #4CAF50; /* Tennis ball green */
+    color: white;
+    padding: 1rem 0;
+    text-align: center;
+    border-bottom: 2px solid #8BC34A;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 0.7rem 1.5rem;
+    margin: 0 0.5rem;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+}
+
+nav a:hover {
+    background-color: #66BB6A;
+}
+
+nav span {
+    display: none; /* Hide the title in the centered nav */
+}
+
+/* =============================================================================
+   TYPOGRAPHY
+   ============================================================================= */
+
+h1, h2 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+h2 {
+    margin-top: 2rem;
+}
+
+/* =============================================================================
+   LINKS
+   ============================================================================= */
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.container a:hover {
+    color: #4CAF50;
+    text-decoration: underline;
+}
+
+/* =============================================================================
+   MESSAGES & ALERTS
+   ============================================================================= */
 
 .messages {
     background-color: #DCEDC8; /* Light green for messages */
@@ -72,15 +106,9 @@ hr {
     border-bottom: none;
 }
 
-h1, h2 {
-    color: #333;
-    text-align: center;
-    margin-bottom: 1rem;
-}
-
-h2 {
-    margin-top: 2rem;
-}
+/* =============================================================================
+   FORMS - BASIC STYLING
+   ============================================================================= */
 
 form {
     background-color: #f9f9f9;
@@ -100,6 +128,25 @@ form p {
     margin-bottom: 0.5rem;
 }
 
+/* Basic form inputs */
+input[type="text"], 
+input[type="email"], 
+input[type="password"] {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 1rem;
+}
+
+input[type="text"]:focus, 
+input[type="email"]:focus, 
+input[type="password"]:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
+/* Basic radio buttons (for simple forms) */
 input[type="radio"] {
     margin-right: 0.5rem;
 }
@@ -109,7 +156,9 @@ label {
     color: #333;
 }
 
-button[type="submit"] {
+/* Submit buttons */
+button[type="submit"], 
+input[type="submit"] {
     background-color: #5cb85c;
     color: white;
     padding: 0.8rem 1.5rem;
@@ -120,9 +169,67 @@ button[type="submit"] {
     transition: background-color 0.3s ease;
 }
 
-button[type="submit"]:hover {
+button[type="submit"]:hover, 
+input[type="submit"]:hover {
     background-color: #4cae4c;
 }
+
+/* =============================================================================
+   PREDICTION COMPONENTS (for index.html and admin.html)
+   ============================================================================= */
+
+.prediction-group {
+    margin-bottom: 1.5rem;
+}
+
+.prediction-group p {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 0.5rem;
+}
+
+.option-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+}
+
+.option-tile {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    text-align: center;
+    overflow: hidden;
+    padding: 0;
+}
+
+.option-tile label {
+    display: block;
+    padding: 0.8rem;
+    margin: 0;
+    cursor: pointer;
+    color: #333;
+}
+
+.option-tile input[type="radio"] {
+    display: none;
+}
+
+.option-tile input[type="radio"]:checked + label {
+    background-color: #DCEDC8;
+    border-color: #DCEDC8;
+    color: #333;
+}
+
+.option-tile:hover {
+    background-color: #eee;
+    border-color: #999;
+}
+
+/* =============================================================================
+   TABLES
+   ============================================================================= */
 
 table {
     width: 100%;
@@ -149,19 +256,73 @@ tr:hover {
     background-color: #f5f5f5;
 }
 
+/* Special table styling for match view */
+.match-table th {
+    text-align: center;
+    font-size: 1.1rem;
+    padding: 1rem;
+}
+
+.match-table td {
+    text-align: center;
+    padding: 0.5rem;
+}
+
+/* =============================================================================
+   UTILITY CLASSES
+   ============================================================================= */
+
 hr {
     border: none;
     border-top: 1px solid #ddd;
     margin: 1rem 0;
 }
-a {
-color: inherit; /* Inherit the text color from the parent */
-text-decoration: none; /* Remove the default underline */
+
+.text-center {
+    text-align: center;
 }
-.container a:hover {
-    color: #4CAF50; /* Your desired hover color */
-    text-decoration: underline; /* Add underline on hover */
+
+.text-bold {
+    font-weight: bold;
 }
+
+.text-green {
+    color: #4CAF50;
+}
+
+.error-text {
+    color: red;
+}
+
 img {
     border-radius: 50%;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+@media (max-width: 768px) {
+    .container {
+        margin: 1rem;
+        padding: 1rem;
     }
+    
+    nav a {
+        padding: 0.5rem 1rem;
+        margin: 0 0.25rem;
+        font-size: 0.9rem;
+    }
+    
+    .option-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    table {
+        font-size: 0.9rem;
+    }
+    
+    th, td {
+        padding: 0.5rem 0.8rem;
+    }
+}

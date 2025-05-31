@@ -160,6 +160,10 @@ def match(match_name):
         .where(Match.player2 == player2)\
         .first()
     
+    if not match:
+        flash('Match not found', 'error')
+        return redirect(url_for('index'))
+    
     predictions = db.session.scalars(
     sa.select(Prediction).where(Prediction.matchId == match.id)
         ).all()
@@ -179,7 +183,13 @@ def leaderboard():
         .limit(1)
     ).scalar_one_or_none()
 
-    user_results = db.session.query(
+    selected_round = request.form.get('round') or request.args.get('round', 'all')
+    
+    # Available rounds
+    available_rounds = ["R1", "R2", "R3", "R4", "QF", "SF", "F"]
+
+    # Base query
+    query = db.session.query(
         User.id,
         User.username,
         func.coalesce(func.sum(
@@ -202,12 +212,22 @@ def leaderboard():
         func.coalesce(func.count(Prediction.id), 0).label('total_predictions_count')
     ).join(Prediction, User.id == Prediction.userId, isouter=True).\
         join(Match, Prediction.matchId == Match.id, isouter=True).\
-        filter(Match.tournament == curentTournament).\
-        group_by(User.id, User.username).\
+        filter(Match.tournament == curentTournament)
+    
+    # Add round filter if not 'all'
+    if selected_round != 'all':
+        query = query.filter(Match.round == selected_round)
+    
+    user_results = query.group_by(User.id, User.username).\
         order_by(desc('total_points')).\
         all()
     
-    return render_template('leaderboard.html', title='Leaderboard', userResults = user_results, currentTournament = curentTournament)
+    return render_template('leaderboard.html', 
+                         title='Leaderboard', 
+                         userResults=user_results, 
+                         currentTournament=curentTournament,
+                         available_rounds=available_rounds,
+                         selected_round=selected_round)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -520,8 +540,62 @@ def admin():
             db.session.commit()
 
         return redirect(url_for('admin'))
+        # Add this: Get ALL matches for the management table
+    all_matches = Match.query.order_by(Match.startTime.desc()).all()
+        
+    return render_template('admin.html', 
+                         title='Admin', 
+                         radio_groups=match_array,
+                         all_matches=all_matches)
+
+@app.route('/admin/edit_match/<int:match_id>', methods=['GET', 'POST'])
+def edit_match(match_id):
+    match = db.session.scalar(sa.select(Match).where(Match.id == match_id))
+    if not match:
+        flash('Match not found', 'error')
+        return redirect(url_for('admin'))
     
-    return render_template('admin.html', title='Admin', radio_groups = match_array)
+    if request.method == 'POST':
+        # Update all editable fields
+        match.round = request.form.get('round')
+        match.player1 = request.form.get('player1')
+        match.player1Price = request.form.get('player1Price')
+        match.player2 = request.form.get('player2')
+        match.player2Price = request.form.get('player2Price')
+        match.winner = request.form.get('winner') if request.form.get('winner') != '' else None
+        
+        # Handle datetime parsing
+        try:
+            start_time_str = request.form.get('start_time')
+            match.startTime = datetime.datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M')
+        except ValueError:
+            flash('Invalid date/time format', 'error')
+            return render_template('edit_match.html', match=match)
+        
+        db.session.commit()
+        flash('Match updated successfully!', 'success')
+        return redirect(url_for('admin'))
+    
+    return render_template('edit_match.html', match=match)
+
+@app.route('/admin/delete_match/<int:match_id>', methods=['POST'])
+def delete_match(match_id):
+    match = db.session.scalar(sa.select(Match).where(Match.id == match_id))
+    if not match:
+        flash('Match not found', 'error')
+        return redirect(url_for('admin'))
+    
+    predictions_to_delete = db.session.scalars(
+    sa.select(Prediction).where(Prediction.matchId == match_id)
+        ).all()
+
+    for p in predictions_to_delete:
+        db.session.delete(p)
+    
+    db.session.delete(match)
+    db.session.commit()
+    flash('Match deleted successfully!', 'success')
+    return redirect(url_for('admin'))
     
     
 

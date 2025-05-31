@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Edit Match</h1>
+
+<form method="POST">
+    <div class="form-group">
+        <label for="round">Round:</label>
+        <input type="text" name="round" value="{{ match.round }}" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="player1">Player 1:</label>
+        <input type="text" name="player1" value="{{ match.player1 }}" required>
+    </div>
+
+    <div class="form-group">
+        <label for="player1Price">Player 1 Price:</label>
+        <input type="text" name="player1Price" value="{{ match.player1Price }}" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="player2">Player 2:</label>
+        <input type="text" name="player2" value="{{ match.player2 }}" required>
+    </div>
+
+    <div class="form-group">
+        <label for="player2Price">Player 2 Price:</label>
+        <input type="text" name="player2Price" value="{{ match.player2Price }}" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="winner">Winner:</label>
+        <select name="winner">
+            <option value="">No Winner</option>
+            <option value="{{ match.player1 }}" {{ 'selected' if match.winner == match.player1 else '' }}>{{ match.player1 }}</option>
+            <option value="{{ match.player2 }}" {{ 'selected' if match.winner == match.player2 else '' }}>{{ match.player2 }}</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label for="start_time">Start Time:</label>
+        <input type="datetime-local" name="start_time" 
+               value="{{ match.startTime.strftime('%Y-%m-%dT%H:%M') }}" required>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Update Match</button>
+    <a href="{{ url_for('admin') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

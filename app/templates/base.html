@@ -12,7 +12,7 @@
 </head>
     <body>
         <nav>
-            <a href="{{ url_for('index') }}" style="font-size: 1.2em; font-weight: bold;">matchPoints</a>
+            <a href="{{ url_for('index') }}" style="font-weight: bold;">matchPoints</a>
             <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
             <a href="{{ url_for('leaderboard') }}">Leaderboard</a>
             {% if current_user.is_anonymous %}
