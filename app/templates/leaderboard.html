@@ -6,7 +6,17 @@
     margin-bottom: 20px;
 }
 
-.filter-buttons > div {
+.filter-section {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.filter-section > span {
+    min-width: 60px; /* Fixed width for labels to align buttons */
+}
+
+.filter-buttons > div, .filter-section > div {
     display: flex;
     gap: 5px;
 }
@@ -73,7 +83,7 @@
         font-size: 0.8em;
         width: 30px; 
     }
-    .filter-buttons > div {
+    .filter-buttons > div, .filter-section > div {
         gap: 3px; /* Reduce gap between buttons for very small screens */
     }
 }
@@ -83,19 +93,38 @@
 
 {% block content %}
     <h1>{{currentTournament}} 2025</h1>
-    <div class="filter-buttons">
-        <span style="font-weight: bold; margin-right: 10px;">Filter by Round:</span>
-        <div>
-            <a href="{{ url_for('leaderboard', round='all') }}" 
-               class="filter-btn {{ 'active' if selected_round == 'all' else '' }}">
-               All
-            </a>
-            {% for round in available_rounds %}
-                <a href="{{ url_for('leaderboard', round=round) }}" 
-                   class="filter-btn {{ 'active' if selected_round == round else '' }}">
-                   {{ round }}
+    <div class="filter-buttons">       
+        <div class="filter-section">
+            <span style="font-weight: bold; margin-right: 10px;">Gender:</span>
+            <div>
+                <a href="{{ url_for('leaderboard', round=selected_round, gender='all') }}" 
+                   class="filter-btn {{ 'active' if selected_gender == 'all' or selected_gender is none else '' }}">
+                   All
                 </a>
-            {% endfor %}
+                <a href="{{ url_for('leaderboard', round=selected_round, gender='M') }}" 
+                   class="filter-btn {{ 'active' if selected_gender == 'M' else '' }}">
+                   M
+                </a>
+                <a href="{{ url_for('leaderboard', round=selected_round, gender='W') }}" 
+                   class="filter-btn {{ 'active' if selected_gender == 'W' else '' }}">
+                   W
+                </a>
+            </div>
+        </div>
+        <div class="filter-section">
+            <span style="font-weight: bold; margin-right: 10px;">Round:</span>
+            <div>
+                <a href="{{ url_for('leaderboard', round='all', gender=selected_gender) }}" 
+                   class="filter-btn {{ 'active' if selected_round == 'all' else '' }}">
+                   All
+                </a>
+                {% for round in available_rounds %}
+                    <a href="{{ url_for('leaderboard', round=round, gender=selected_gender) }}" 
+                       class="filter-btn {{ 'active' if selected_round == round else '' }}">
+                       {{ round }}
+                    </a>
+                {% endfor %}
+            </div>
         </div>
     </div>
     <table>

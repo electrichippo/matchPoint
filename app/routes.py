@@ -184,9 +184,12 @@ def leaderboard():
     ).scalar_one_or_none()
 
     selected_round = request.form.get('round') or request.args.get('round', 'all')
+    selected_gender = request.form.get('gender') or request.args.get('gender', 'all')
     
     # Available rounds
     available_rounds = ["R1", "R2", "R3", "R4", "QF", "SF", "F"]
+
+    available_genders = ["All","M", "W"]
 
     # Base query
     query = db.session.query(
@@ -217,6 +220,13 @@ def leaderboard():
     # Add round filter if not 'all'
     if selected_round != 'all':
         query = query.filter(Match.round == selected_round)
+
+    # Add gender filter if not 'both'
+    if selected_gender == 'M':
+        query = query.filter(Match.tour == 'ATP')
+    elif selected_gender == 'W':
+        query = query.filter(Match.tour == 'WTA')
+    # If 'both', no additional filter is applied
     
     user_results = query.group_by(User.id, User.username).\
         order_by(desc('total_points')).\
@@ -227,7 +237,9 @@ def leaderboard():
                          userResults=user_results, 
                          currentTournament=curentTournament,
                          available_rounds=available_rounds,
-                         selected_round=selected_round)
+                         available_genders=available_genders,
+                         selected_round=selected_round,
+                         selected_gender=selected_gender)
 
 
 @app.route('/login', methods=['GET', 'POST'])

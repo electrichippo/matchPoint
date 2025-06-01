@@ -1,6 +1,45 @@
 {% extends "base.html" %}
+{% block page_styles %}
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    /* Style the table cell that contains your profile header */
+    .profile-header-cell {
+        text-align: left; /* Ensures the content within this cell is left-aligned */
+        padding: 10px; /* Add some padding around the content within the cell */
+    }
+
+    /* This is our Flexbox container for the image and text */
+    .profile-header-content {
+        display: flex; /* Makes the div a flex container */
+        align-items: center; /* Vertically centers the image and text */
+        justify-content: flex-start; /* Aligns content to the left (start of the flex container) */
+        gap: 30px; /* Adds space between the image and the h1 */
+        /* You can adjust this gap as needed */
+    }
+
+    /* Styles for the image */
+    img {
+        border-radius: 50%;
+        width: 200px;
+        height: 200px;
+        flex-shrink: 0; /* Prevents the image from shrinking if space is tight */
+        /* No need for display: block or margin: 0 here as flexbox handles it */
+    }
+</style>
+{% endblock %}
 
 {% block content %}
+
+<!-- Profile picture development -->
+<!-- <div class="profile-header-content">
+    <img src="/static/images/roger_federer.jpg" alt="Profile Image">
+    <h1>{{ user.username }}</h1>
+</div> -->
+
 {% if user != current_user %}
     <h1>{{user.username}}'s Prediction History</h1>
 {% endif %}
@@ -8,7 +47,7 @@
     <h1>Prediction History</h1>
 {% endif %}
 
-<h2>{{currentTournament}} 2025</h2>
+<h2>Prediction History - {{currentTournament}} 2025</h2>
 <table>
     <thead>
         <tr>
