@@ -7,6 +7,7 @@ import json
 import random
 import datetime
 from fileinput import filename 
+import pytz
 
 import app.data_fetch as data
 
@@ -25,13 +26,16 @@ def index():
         filter(Prediction.userId == user_id).all()
     # Convert the result to a flat list of IDs
     predicted_match_ids = [match_id for (match_id,) in predicted_match_ids]
+
+    aest = pytz.timezone('Australia/Sydney')
+    now_aest = datetime.datetime.now(aest)
     
     # Query for all matches that are not in the predicted list
     unpredicted_matches = Match.query.\
         filter(Match.id.notin_(predicted_match_ids)).\
         filter(Match.winner == None).\
-        filter(Match.startTime > datetime.datetime.now()).\
-        order_by(Match.startTime).\
+        filter(Match.startTime > now_aest).\
+        order_by(Match.tour, Match.startTime).\
         all()
     
     # Predicitions on upcoming matches
@@ -39,7 +43,7 @@ def index():
         .join(Match, Prediction.matchId == Match.id)\
         .filter(Match.winner == None)\
         .filter(Prediction.userId == current_user.id)\
-        .order_by(Match.startTime)\
+        .order_by(Match.tour, Match.startTime)\
         .all()
     
     db.session.commit()
