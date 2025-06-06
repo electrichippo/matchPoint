@@ -15,6 +15,8 @@ class User(UserMixin, db.Model):
                                              unique=True)
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
 
+    profile_picture : so.Mapped[str] = so.mapped_column(sa.String(140), nullable=True)
+
     predictions: so.WriteOnlyMapped['Prediction'] = so.relationship(
         back_populates='maker')
 
@@ -26,6 +28,33 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    def get_total_predictions(self):
+        return db.session.scalar(
+            sa.select(sa.func.count(Prediction.id)).where(Prediction.userId == self.id)
+        )
+    
+    def get_success_rate(self):
+        # Get predictions where match has a winner (settled matches)
+        settled_predictions = db.session.scalars(
+            sa.select(Prediction)
+            .join(Match)
+            .where(Prediction.userId == self.id)
+            .where(Match.winner.is_not(None))
+        ).all()
+        
+        if not settled_predictions:
+            return 0
+        
+        correct = sum(1 for pred in settled_predictions if pred.player == pred.match.winner)
+        return round((correct / len(settled_predictions)) * 100, 1)
+    
+    def get_correct_predictions(self):
+        return db.session.scalar(
+            sa.select(sa.func.count(Prediction.id))
+            .join(Match)
+            .where(Prediction.userId == self.id)
+            .where(Match.winner == Prediction.player)
+        )
     
 @login.user_loader
 def load_user(id):

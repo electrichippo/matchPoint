@@ -385,6 +385,12 @@ hr {
     form p {
         font-size: 0.8rem;
     }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+        font-size: 0.5rem;
+    }
     
     input[type="text"], 
     input[type="email"], 

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Edit Profile</h1>
+  <form method="post">
+    {{ form.hidden_tag() }}
+
+    <p>
+      {{ form.username.label }}<br>
+      {{ form.username() }}<br>
+      {% for error in form.username.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+      {% endfor %}
+    </p>
+
+    <p>{{ form.selected_image.label }}</p>
+    <div id="image-grid" style="display: flex; flex-wrap: wrap; gap: 10px;">
+      {% for image in images %}
+        <label class="image-label" style="width: 150px; height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 2px solid #ccc; border-radius: 0; padding: 8px; box-sizing: border-box; cursor: pointer;">
+          <input type="radio" name="selected_image" value="{{ image }}" style="display: none;">
+          <img src="{{ url_for('static', filename='images/' + image) }}" alt="{{ image }}" width="100" height="100">
+        </label>
+      {% endfor %}
+    </div>
+    {% for error in form.selected_image.errors %}
+      <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+
+    <p>{{ form.submit() }}</p>
+  </form>
+
+  <script>
+    document.querySelectorAll('input[name="selected_image"]').forEach(input => {
+      input.addEventListener('change', () => {
+        document.querySelectorAll('.image-label').forEach(label => {
+          label.style.borderColor = '#ccc';
+        });
+        const selectedLabel = input.closest('label');
+        selectedLabel.style.borderColor = '#4CAF50';
+      });
+    });
+  </script>
+{% endblock %}

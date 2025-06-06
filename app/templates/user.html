@@ -5,47 +5,95 @@
         width: 100%;
         border-collapse: collapse;
     }
-
-    /* Style the table cell that contains your profile header */
-    .profile-header-cell {
-        text-align: left; /* Ensures the content within this cell is left-aligned */
-        padding: 10px; /* Add some padding around the content within the cell */
-    }
-
-    /* This is our Flexbox container for the image and text */
+    
+    /* Profile header container - split into two halves */
     .profile-header-content {
-        display: flex; /* Makes the div a flex container */
-        align-items: center; /* Vertically centers the image and text */
-        justify-content: flex-start; /* Aligns content to the left (start of the flex container) */
-        gap: 30px; /* Adds space between the image and the h1 */
-        /* You can adjust this gap as needed */
+        display: flex;
+        gap: 2rem; /* Space between left and right sections */
+        align-items: center; /* This will vertically center both halves */
+        margin-bottom: 2rem;
+        
+        /* Box styling */
+        background-color: #f8f9fa; /* Light gray background */
+        border: 1px solid #e9ecef; /* Subtle border */
+        border-radius: 12px; /* Rounded corners */
+        padding: 2rem; /* Internal spacing */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
     }
-
+    
+    /* Left half - image container */
+    .profile-image-section {
+        flex: 1; /* Takes up half the width */
+        display: flex;
+        justify-content: center; /* Centers the image in its half */
+    }
+    
+    /* Right half - user info container */
+    .profile-info-section {
+        flex: 1; /* Takes up half the width */
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem; /* Space between info lines */
+    }
+    
     /* Styles for the image */
     img {
         border-radius: 50%;
         width: 200px;
         height: 200px;
-        flex-shrink: 0; /* Prevents the image from shrinking if space is tight */
-        /* No need for display: block or margin: 0 here as flexbox handles it */
+        object-fit: cover; /* Ensures image fills the circle properly */
+    }
+    
+    /* Username styling */
+    .profile-info-section h1 {
+        margin: 0;
+        text-align: left;
+        font-size: 2rem;
+    }
+    
+    /* User info lines styling */
+    .user-info-line {
+        text-align: left;
+        margin: 0;
+        font-size: 1rem;
+        color: #666; /* Slightly muted color for info lines */
     }
 </style>
 {% endblock %}
 
 {% block content %}
 
-<!-- Profile picture development -->
-<!-- <div class="profile-header-content">
-    <img src="/static/images/roger_federer.jpg" alt="Profile Image">
-    <h1>{{ user.username }}</h1>
-</div> -->
+<!-- Profile picture and info section -->
+<div class="profile-header-content">
+    <!-- Left half - Image -->
+    <div class="profile-image-section">
+        {% if user.profile_picture %}
+        <img src="{{ url_for('static', filename='images/' + user.profile_picture) }}" alt="Profile Image">
+        {% else %}
+        <img src="/static/images/a tennis ball logo.png" alt="Profile Image">
+        {% endif %}
+    </div>
+    
+    <!-- Right half - User information -->
+    <div class="profile-info-section">
+        <h1>{{ user.username }}</h1>
+        <p class="user-info-line">Total predictions: {{ user.get_total_predictions() }}</p>
+        <p class="user-info-line">Success rate: {{ user.get_success_rate() }}%</p>
+        {% if user_position %}
+        <p class="user-info-line">Current ranking: #{{ user_position }}</p>
+        {% endif %}
+        {% if user == current_user %}
+        <a href="{{ url_for('edit_profile') }}"class="user-info-line">Edit profile</a>
+        {% endif %}
+    </div>
+</div>
 
-{% if user != current_user %}
+<!-- {% if user != current_user %}
     <h1>{{user.username}}'s Prediction History</h1>
 {% endif %}
 {% if user == current_user %}
     <h1>Prediction History</h1>
-{% endif %}
+{% endif %} -->
 
 <h2>Prediction History - {{currentTournament}} 2025</h2>
 <table>

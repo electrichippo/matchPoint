@@ -65,6 +65,13 @@
     color: #666;
     font-size: 0.9em;
 }
+.profile-icon-small {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    vertical-align: middle;
+    margin-right: 8px; /* This is the space you wanted */
+}
 
 /* --- Media Queries --- */
 @media screen and (max-width: 480px) {
@@ -73,6 +80,13 @@
         padding: 6px 8px; /* Slightly less padding */
         font-size: 0.9em; /* Smaller font size */
         width: 30px; 
+    }
+    .profile-icon-small {
+        border-radius: 50%;
+        width: 12px;
+        height: 12px;
+        vertical-align: middle;
+        margin-right: 2px; /* This is the space you wanted */
     }
 }
 
@@ -86,7 +100,16 @@
     .filter-buttons > div, .filter-section > div {
         gap: 3px; /* Reduce gap between buttons for very small screens */
     }
+    .profile-icon-small {
+        border-radius: 50%;
+        width: 10px;
+        height: 10px;
+        vertical-align: middle;
+        margin-right: 0px; /* This is the space you wanted */
+    }
 }
+
+
 </style>
 
 {% endblock %}
@@ -130,23 +153,37 @@
     <table>
         <thead>
             <tr>
+                <th></th>
                 <th>Position</th>
-                <th>User</th>
                 <th>Correct Predictions</th>
                 <th>Points</th>
             </tr>
         </thead>
         <tbody>
-            {% for userId, username, points, numCorrect, predCount in userResults %}
+            {% for userId, username, profile_image, points, numCorrect, predCount in userResults %}
             <tr>
                 {% if current_user.id == userId %}
+                    <td class="text-bold" style="text-align: left;">
+                        {% if profile_image %}
+                        <img src="{{ url_for('static', filename='images/' + profile_image) }}" alt="{{ username }}'s image" class="profile-icon-small">
+                        {% else %}
+                        <img src="/static/images/a tennis ball logo.png" alt="{{ username }}'s image" class="profile-icon-small">
+                        {% endif %}
+                        <a href="{{ url_for('user', username=username) }}">{{username}}</a>
+                    </td>
                     <td class="text-bold">{{ loop.index }}</td>
-                    <td class="text-bold"><a href="{{ url_for('user', username=username) }}">{{username}}</a></td>
                     <td class="text-bold">{{ numCorrect }}</td>
                     <td class="text-bold">{{ points|round(1)}}</td>
                 {% else %}
+                    <td style="text-align: left;">
+                        {% if profile_image %}
+                        <img src="{{ url_for('static', filename='images/' + profile_image) }}" alt="{{ username }}'s class="profile-icon-small">
+                        {% else %}
+                        <img src="/static/images/a tennis ball logo.png" alt="{{ username }}'s image" class="profile-icon-small">
+                        {% endif %}
+                        <a href="{{ url_for('user', username=username) }}">{{username}}</a>
+                    </td>
                     <td>{{ loop.index }}</td>
-                    <td><a href="{{ url_for('user', username=username) }}">{{username}}</a></td>
                     <td>{{ numCorrect }}</td>
                     <td>{{ points|round(1) }}</td>
                 {% endif %}

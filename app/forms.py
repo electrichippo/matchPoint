@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField, HiddenField, FieldList, FormField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+from wtforms import TextAreaField
+from wtforms.validators import Length
 import sqlalchemy as sa
 from app import db
 from app.models import User
@@ -35,4 +37,9 @@ class RegistrationForm(FlaskForm):
 
 class PredictionForm(FlaskForm):
     prediction = RadioField('Select an Option', validators=[DataRequired()], choices=[])
+
+class EditProfileForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    selected_image = RadioField('Select Profile Image', validators=[DataRequired()])
+    submit = SubmitField('Submit')
 

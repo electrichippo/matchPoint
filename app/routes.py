@@ -8,11 +8,13 @@ import random
 import datetime
 from fileinput import filename 
 import pytz
+import os
+import glob
 
 import app.data_fetch as data
 
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, PredictionForm
+from app.forms import LoginForm, RegistrationForm, PredictionForm, EditProfileForm
 from app.models import User, Match, Prediction
 
 @app.route('/', methods=['GET', 'POST'])
@@ -141,7 +143,54 @@ def user(username):
         .order_by(desc(Match.startTime))\
         .all()
     
-    return render_template('user.html', title='User',settled_predictions = settled_predictions, currentTournament = currentTournament, user=user)
+    points_subquery = (
+        db.session.query(
+            User.id.label('user_id'),
+            sa.func.coalesce(
+                sa.func.sum(
+                    sa.case(
+                        (Prediction.player == Match.winner, 
+                         sa.case(
+                             (Prediction.player == Match.player1, Match.player1Price),
+                             (Prediction.player == Match.player2, Match.player2Price),
+                             else_=0
+                         )),
+                        else_=0
+                    )
+                ), 0
+            ).label('total_points')
+        )
+        .outerjoin(Prediction, User.id == Prediction.userId)
+        .outerjoin(Match, sa.and_(
+            Prediction.matchId == Match.id,
+            Match.tournament == currentTournament,
+            Match.winner.is_not(None)
+        ))
+        .group_by(User.id)
+        .subquery()
+    )
+    
+    # Query to get rankings
+    rankings = (
+        db.session.query(
+            User.id,
+            User.username,
+            points_subquery.c.total_points,
+            sa.func.rank().over(order_by=points_subquery.c.total_points.desc()).label('rank')
+        )
+        .join(points_subquery, User.id == points_subquery.c.user_id)
+        .order_by(points_subquery.c.total_points.desc())
+        .all()
+    )
+    
+    # Find user's position
+    user_position = None
+    for ranking in rankings:
+        if ranking.id == user.id:
+            user_position = ranking.rank
+            break
+    
+    return render_template('user.html', title='User',settled_predictions = settled_predictions, currentTournament = currentTournament, user=user, user_position = user_position)
 
 @app.route('/match/<match_name>')
 @login_required
@@ -199,6 +248,7 @@ def leaderboard():
     query = db.session.query(
         User.id,
         User.username,
+        User.profile_picture,
         func.coalesce(func.sum(
             sa.case(
                 (Prediction.player == Match.winner,
@@ -235,7 +285,7 @@ def leaderboard():
     user_results = query.group_by(User.id, User.username).\
         order_by(desc('total_points')).\
         all()
-    
+        
     return render_template('leaderboard.html', 
                          title='Leaderboard', 
                          userResults=user_results, 
@@ -284,6 +334,42 @@ def register():
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+def get_available_images():
+    """Get list of images from static/images/ directory"""
+    image_extensions = ['*.jpg', '*.jpeg', '*.png', '*.gif', '*.bmp', '*.webp']
+    images = []
+    
+    images_path = os.path.join(app.static_folder, 'images')
+    
+    if os.path.exists(images_path):
+        for extension in image_extensions:
+            pattern = os.path.join(images_path, extension)
+            found_images = glob.glob(pattern, recursive=False)
+            # Convert full paths to relative paths for web serving
+            for img_path in found_images:
+                filename = os.path.basename(img_path)
+                images.append(filename)
+    
+    return sorted(images)
+
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm()
+    available_images = get_available_images()
+
+    form.selected_image.choices = [(img, img) for img in available_images]
+    if form.validate_on_submit():
+        current_user.profile_picture = form.selected_image.data
+        current_user.username = form.username.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for('edit_profile'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+    return render_template('edit_profile.html', title='Edit Profile',
+                           form=form, images=available_images)
 
 @app.route('/refresh')
 def refresh():
