@@ -76,8 +76,7 @@ def index():
             option['matchId'] = group['name']
             option['player'] = request.form.get(group['name'])
             options.append(option)
-        
-        print(options)
+    
     
         # CREATE PREDICTIONS HERE
         # Get user
@@ -361,8 +360,8 @@ def edit_profile():
 
     form.selected_image.choices = [(img, img) for img in available_images]
     if form.validate_on_submit():
-        current_user.profile_picture = form.selected_image.data
         current_user.username = form.username.data
+        current_user.profile_picture = form.selected_image.data
         db.session.commit()
         flash('Your changes have been saved.')
         return redirect(url_for('edit_profile'))
@@ -512,6 +511,8 @@ def success():
             all_matches = json.load(f) 
 
         for match in all_matches:
+
+            print(match)
             player1 = match['homeTeam']
             player2 = match['awayTeam']
             start_time = datetime.datetime.strptime(match['startsAt'], '%Y-%m-%d %H:%M:%S')
@@ -578,6 +579,7 @@ def success():
             db.session.commit()
             
             if not existing_match:
+                print(match)
                 match = Match(
                     tournament = tournament,
                     round = round_name,

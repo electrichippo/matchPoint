@@ -1,132 +1,319 @@
 {% extends "base.html" %}
+
 {% block page_styles %}
 <style>
-    table {
-        width: 100%;
-        border-collapse: collapse;
+/* Profile header styling */
+.profile-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #dee2e6;
+}
+
+.profile-image-container {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.profile-image-large {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--tennis-green);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.profile-username {
+    color: var(--tennis-green);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.stats-card {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    height: 100%;
+}
+
+.stats-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--tennis-green);
+    margin-bottom: 0.25rem;
+}
+
+.stats-label {
+    color: #6c757d;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.edit-profile-btn {
+    background: linear-gradient(135deg, var(--tennis-green) 0%, var(--tennis-light-green) 100%);
+    border: none;
+    color: white;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.edit-profile-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.section-title {
+    color: var(--tennis-green);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.prediction-row {
+    transition: background-color 0.2s ease;
+}
+
+.prediction-row:hover {
+    background-color: rgba(76, 175, 80, 0.05);
+}
+
+.outcome-positive {
+    color: var(--tennis-green);
+    font-weight: 600;
+}
+
+.outcome-neutral {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.match-link {
+    color: var(--tennis-green);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.match-link:hover {
+    color: var(--tennis-light-green);
+    text-decoration: underline;
+}
+
+.round-badge {
+    background: linear-gradient(135deg, var(--tennis-green) 0%, var(--tennis-light-green) 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+    .profile-header {
+        padding: 1.5rem;
     }
     
-    /* Profile header container - split into two halves */
-    .profile-header-content {
-        display: flex;
-        gap: 2rem; /* Space between left and right sections */
-        align-items: center; /* This will vertically center both halves */
-        margin-bottom: 2rem;
-        
-        /* Box styling */
-        background-color: #f8f9fa; /* Light gray background */
-        border: 1px solid #e9ecef; /* Subtle border */
-        border-radius: 12px; /* Rounded corners */
-        padding: 2rem; /* Internal spacing */
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    .profile-image-large {
+        width: 150px;
+        height: 150px;
     }
     
-    /* Left half - image container */
-    .profile-image-section {
-        flex: 1; /* Takes up half the width */
-        display: flex;
-        justify-content: center; /* Centers the image in its half */
+    .stats-card {
+        margin-bottom: 1rem;
     }
     
-    /* Right half - user info container */
-    .profile-info-section {
-        flex: 1; /* Takes up half the width */
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem; /* Space between info lines */
+    .section-title {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .profile-header {
+        padding: 1rem;
     }
     
-    /* Styles for the image */
-    img {
-        border-radius: 50%;
-        width: 200px;
-        height: 200px;
-        object-fit: cover; /* Ensures image fills the circle properly */
+    .profile-image-large {
+        width: 120px;
+        height: 120px;
     }
     
-    /* Username styling */
-    .profile-info-section h1 {
-        margin: 0;
-        text-align: left;
-        font-size: 2rem;
+    .profile-username {
+        font-size: 1.5rem;
     }
     
-    /* User info lines styling */
-    .user-info-line {
-        text-align: left;
-        margin: 0;
-        font-size: 1rem;
-        color: #666; /* Slightly muted color for info lines */
+    .stats-value {
+        font-size: 1.25rem;
     }
+    
+    .stats-label {
+        font-size: 0.75rem;
+    }
+}
 </style>
 {% endblock %}
 
 {% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="row align-items-center">
+                <div class="col-lg-4">
+                    <div class="profile-image-container">
+                        {% if user.profile_picture %}
+                        <img src="{{ url_for('static', filename='images/' + user.profile_picture) }}" 
+                             alt="{{ user.username }}'s profile" 
+                             class="profile-image-large">
+                        {% else %}
+                        <img src="/static/images/a tennis ball logo.png" 
+                             alt="Default profile" 
+                             class="profile-image-large">
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-lg-8">
+                    <h1 class="profile-username">
+                        <i class="bi bi-person-circle me-2"></i>{{ user.username }}
+                    </h1>
+                    
+                    <!-- Stats Row -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <div class="stats-value">{{ user.get_total_predictions() }}</div>
+                                <div class="stats-label">Total Predictions</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <div class="stats-value">{{ user.get_success_rate() }}%</div>
+                                <div class="stats-label">Success Rate</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                {% if user_position %}
+                                <div class="stats-value">#{{ user_position }}</div>
+                                <div class="stats-label">Current Ranking</div>
+                                {% else %}
+                                <div class="stats-value">--</div>
+                                <div class="stats-label">Not Ranked</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if user == current_user %}
+                    <div class="text-center text-lg-start">
+                        <a href="{{ url_for('edit_profile') }}" class="edit-profile-btn">
+                            <i class="bi bi-pencil-square me-2"></i>Edit Profile
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
 
-<!-- Profile picture and info section -->
-<div class="profile-header-content">
-    <!-- Left half - Image -->
-    <div class="profile-image-section">
-        {% if user.profile_picture %}
-        <img src="{{ url_for('static', filename='images/' + user.profile_picture) }}" alt="Profile Image">
-        {% else %}
-        <img src="/static/images/a tennis ball logo.png" alt="Profile Image">
-        {% endif %}
-    </div>
-    
-    <!-- Right half - User information -->
-    <div class="profile-info-section">
-        <h1>{{ user.username }}</h1>
-        <p class="user-info-line">Total predictions: {{ user.get_total_predictions() }}</p>
-        <p class="user-info-line">Success rate: {{ user.get_success_rate() }}%</p>
-        {% if user_position %}
-        <p class="user-info-line">Current ranking: #{{ user_position }}</p>
-        {% endif %}
-        {% if user == current_user %}
-        <a href="{{ url_for('edit_profile') }}"class="user-info-line">Edit profile</a>
-        {% endif %}
+        <!-- Prediction History Section -->
+        <div class="mb-4">
+            <h2 class="section-title">
+                <i class="bi bi-clock-history"></i>
+                Prediction History - {{ currentTournament }} 2025
+            </h2>
+            
+            {% if settled_predictions %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 120px;">
+                                <i class="bi bi-flag-fill me-1"></i>Round
+                            </th>
+                            <th scope="col">
+                                <i class="bi bi-trophy-fill me-1"></i>Match
+                            </th>
+                            <th scope="col">
+                                <i class="bi bi-person-check-fill me-1"></i>Predicted
+                            </th>
+                            <th scope="col">
+                                <i class="bi bi-star-fill me-1"></i>Points
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pred in settled_predictions %}
+                        <tr class="prediction-row">
+                            <td>
+                                <span class="round-badge">{{ pred.match.round }}</span>
+                            </td>
+                            <td>
+                                {% set matchup = pred.match.player1 ~ ' vs ' ~ pred.match.player2 %}
+                                <a href="{{ url_for('match', match_name=matchup) }}" class="match-link" style="color: black;">
+                                    {{ pred.match.player1 }} vs {{ pred.match.player2 }}
+                                </a>
+                            </td>
+                            <td>
+                                {% if pred.player == pred.match.winner %}
+                                    <i class="bi bi-check-circle-fill text-success ms-1" title="Correct prediction"></i>
+                                {% else %}
+                                    <i class="bi bi-x-circle-fill text-danger ms-1" title="Incorrect prediction"></i>
+                                {% endif %}
+                                <span class="fw-medium">{{ pred.player }}</span>
+                            </td>
+                            <td>
+                                {% if pred.player == pred.match.winner %}
+                                    <span class="outcome-positive">
+                                        <i class="bi bi-plus-circle-fill me-1"></i>
+                                        {{ pred.match.get_player_price(pred.player) }}
+                                    </span>
+                                {% else %}
+                                    <span class="outcome-neutral">
+                                        <i class="bi bi-dash-circle me-1"></i>
+                                        0
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-info-circle display-1 text-muted"></i>
+                </div>
+                <h4 class="text-muted">No predictions yet</h4>
+                <p class="text-muted">
+                    {% if user == current_user %}
+                        Start making predictions to see your history here!
+                    {% else %}
+                        {{ user.username }} hasn't made any predictions yet.
+                    {% endif %}
+                </p>
+            </div>
+            {% endif %}
+        </div>
     </div>
 </div>
-
-<!-- {% if user != current_user %}
-    <h1>{{user.username}}'s Prediction History</h1>
-{% endif %}
-{% if user == current_user %}
-    <h1>Prediction History</h1>
-{% endif %} -->
-
-<h2>Prediction History - {{currentTournament}} 2025</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Round</th>
-            <th>Match</th>
-            <th>Predicted</th>
-            <th>Outcome</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for pred in settled_predictions %}
-        <tr>
-            <td>{{ pred.match.round }}</td>
-            {% set matchup = pred.match.player1 ~ ' vs ' ~ pred.match.player2 %}
-            <td><a href="{{ url_for('match', match_name=matchup) }}">{{ pred.match.player1 }} vs {{ pred.match.player2 }}</a></td>
-            <td>{{ pred.player }}</td>
-            <td>
-                {% if pred.player == pred.match.winner %}
-                    + {{ pred.match.get_player_price(pred.player)}}
-                {% else %}
-                    + 0
-                {% endif %}
-            </td>
-        </tr>
-        {% if not loop.last %}
-        <tr>
-            <td colspan="4"><hr></td>
-        </tr>
-        {% endif %}
-        {% endfor %}
-    </tbody>
-</table>
-
 {% endblock %}

@@ -1,48 +1,309 @@
 {% extends "base.html" %}
 
+{% block page_styles %}
+<style>
+.match-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #dee2e6;
+    text-align: center;
+}
+
+.match-title {
+    color: var(--tennis-green);
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.round-badge {
+    background: linear-gradient(135deg, var(--tennis-green) 0%, var(--tennis-light-green) 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+.player-column {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 2px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.player-column.winner {
+    border-color: var(--tennis-green);
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.05) 0%, rgba(102, 187, 106, 0.05) 100%);
+}
+
+.player-header {
+    text-align: center;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.player-header.winner {
+    border-bottom-color: var(--tennis-green);
+}
+
+.player-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.player-name.winner {
+    color: var(--tennis-green);
+}
+
+.player-odds {
+    font-size: 1rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.winner-badge {
+    background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%);
+    color: #212529;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.predictions-list {
+    min-height: 200px;
+}
+
+.prediction-item {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid var(--tennis-accent);
+    transition: all 0.2s ease;
+}
+
+.prediction-item:hover {
+    background-color: rgba(76, 175, 80, 0.1);
+    transform: translateX(4px);
+}
+
+.prediction-item:last-child {
+    margin-bottom: 0;
+}
+
+.user-link {
+    color: var(--tennis-green);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.user-link:hover {
+    color: var(--tennis-light-green);
+    text-decoration: underline;
+}
+
+.user-link.current-user {
+    font-weight: 700;
+    color: #ff9800;
+}
+
+.user-link.current-user:hover {
+    color: #ffc107;
+}
+
+.no-predictions {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 2rem;
+}
+
+.predictions-count {
+    background-color: var(--tennis-green);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .match-header {
+        padding: 1.5rem;
+    }
+    
+    .player-column {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .match-title {
+        font-size: 1.5rem;
+    }
+    
+    .player-name {
+        font-size: 1.1rem;
+    }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>{{ match.round }} - {{ match.player1 }} vs {{ match.player2 }}</h2>
+<div class="row">
+    <div class="col-12">
+        <!-- Match Header -->
+        <div class="match-header">
+            <div class="round-badge">
+                <i class="bi bi-flag-fill me-1"></i>{{ match.round }}
+            </div>
+            <h1 class="match-title">
+                <!-- <i class="bi bi-trophy-fill me-2"></i> -->
+                {{ match.player1 }} vs {{ match.player2 }}
+            </h1>
+        </div>
 
-<table class="match-table">
-    <thead>
-        <tr>
-            {% if match.player1 == match.winner %}
-                <th>{{ match.player1 }} | {{ match.player1Price }} (W)</th>
-                <th>{{ match.player2 }} | {{ match.player2Price }}</th>
-            {% else %}
-                <th>{{ match.player1 }} | {{ match.player1Price }}</th>
-                <th>{{ match.player2 }} | {{ match.player2Price }} (W)</th>
-            {% endif %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for p in predictions %}
-        <tr>
-            <td> 
-                {% if p.player == match.player1 %}
-                    {% if current_user.id == p.maker.id %}
-                        <a href="{{ url_for('user', username=p.maker.username) }}" class="text-bold">{{p.maker.username}}</a>
-                    {% else %}
-                        <a href="{{ url_for('user', username=p.maker.username) }}">{{p.maker.username}}</a>
-                    {% endif %}
-                {% else %}
-                    {{ " " }}
-                {% endif %}
-            </td>
-            <td>
-                {% if p.player == match.player2 %}
-                    {% if current_user.id == p.maker.id %}
-                        <a href="{{ url_for('user', username=p.maker.username) }}" class="text-bold">{{p.maker.username}}</a>
-                    {% else %}
-                        <a href="{{ url_for('user', username=p.maker.username) }}">{{p.maker.username}}</a>
-                    {% endif %}
-                {% else %}
-                    {{ " " }}
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        <!-- Players and Predictions -->
+        <div class="row g-4">
+            <!-- Player 1 Column -->
+            <div class="col-lg-6">
+                <div class="player-column {{ 'winner' if match.player1 == match.winner else '' }}">
+                    <div class="player-header {{ 'winner' if match.player1 == match.winner else '' }}">
+                        <div class="player-name {{ 'winner' if match.player1 == match.winner else '' }}">
+                            {{ match.player1 }}
+                            {% if match.player1 == match.winner %}
+                                <span class="winner-badge">
+                                    <i class="bi bi-trophy-fill me-1"></i>Winner
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div class="player-odds">
+                            Points: {{ match.player1Price }}
+                            {% set player1_predictions = predictions|selectattr('player', 'equalto', match.player1)|list %}
+                            <span class="predictions-count">{{ player1_predictions|length }} predictions</span>
+                        </div>
+                    </div>
+                    
+                    <div class="predictions-list">
+                        {% set player1_predictions = predictions|selectattr('player', 'equalto', match.player1)|list %}
+                        {% if player1_predictions %}
+                            {% for p in player1_predictions %}
+                            <div class="prediction-item">
+                                {% if current_user.id == p.maker.id %}
+                                    <a href="{{ url_for('user', username=p.maker.username) }}" class="user-link current-user">
+                                        <i class="bi bi-person-fill me-1"></i>{{ p.maker.username }} (You)
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('user', username=p.maker.username) }}" class="user-link">
+                                        <i class="bi bi-person me-1"></i>{{ p.maker.username }}
+                                    </a>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="no-predictions">
+                                <i class="bi bi-info-circle mb-2 d-block" style="font-size: 2rem;"></i>
+                                No predictions for this player
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
 
+            <!-- Player 2 Column -->
+            <div class="col-lg-6">
+                <div class="player-column {{ 'winner' if match.player2 == match.winner else '' }}">
+                    <div class="player-header {{ 'winner' if match.player2 == match.winner else '' }}">
+                        <div class="player-name {{ 'winner' if match.player2 == match.winner else '' }}">
+                            {{ match.player2 }}
+                            {% if match.player2 == match.winner %}
+                                <span class="winner-badge">
+                                    <i class="bi bi-trophy-fill me-1"></i>Winner
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div class="player-odds">
+                            Points: {{ match.player2Price }}
+                            {% set player2_predictions = predictions|selectattr('player', 'equalto', match.player2)|list %}
+                            <span class="predictions-count">{{ player2_predictions|length }} predictions</span>
+                        </div>
+                    </div>
+                    
+                    <div class="predictions-list">
+                        {% set player2_predictions = predictions|selectattr('player', 'equalto', match.player2)|list %}
+                        {% if player2_predictions %}
+                            {% for p in player2_predictions %}
+                            <div class="prediction-item">
+                                {% if current_user.id == p.maker.id %}
+                                    <a href="{{ url_for('user', username=p.maker.username) }}" class="user-link current-user">
+                                        <i class="bi bi-person-fill me-1"></i>{{ p.maker.username }} (You)
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('user', username=p.maker.username) }}" class="user-link">
+                                        <i class="bi bi-person me-1"></i>{{ p.maker.username }}
+                                    </a>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="no-predictions">
+                                <i class="bi bi-info-circle mb-2 d-block" style="font-size: 2rem;"></i>
+                                No predictions for this player
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match Statistics -->
+        {% if predictions %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card bg-light border-0">
+                    <div class="card-body text-center">
+                        <div class="row">
+                            <div class="col-4">
+                                {% set player1_count = predictions|selectattr('player', 'equalto', match.player1)|list|length %}
+                                <div class="h5 mb-0 text-success">
+                                    {{ "%.1f"|format((player1_count / predictions|length * 100)) }}%
+                                </div>
+                                <small class="text-muted">Picked {{ match.player1 }}</small>
+                            </div>
+                            <div class="col-4">
+                                <div class="h5 mb-0 text-success">{{ predictions|length }}</div>
+                                <small class="text-muted">Total Predictions</small>
+                            </div>
+                            <div class="col-4">
+                                {% set player2_count = predictions|selectattr('player', 'equalto', match.player2)|list|length %}
+                                <div class="h5 mb-0 text-success">
+                                    {{ "%.1f"|format((player2_count / predictions|length * 100)) }}%
+                                </div>
+                                <small class="text-muted">Picked {{ match.player2 }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

@@ -1,61 +1,96 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{currentTournament}} 2025</h1>
+<div class="text-center mb-4">
+    <h1 class="display-4 fw-bold" style= "color: var(--tennis-green);">
+        <i class="bi bi-trophy-fill me-3"></i>{{ currentTournament }} 2025
+    </h1>
+</div>
 
 {% if radio_groups %}
-<h2>Predictions</h2>
+<div class="prediction-section fade-in-up">
+    <h2 class="h3 mb-4 text-center">
+        <i class="bi bi-bullseye me-2"></i>Make Your Predictions
+    </h2>
+    
     <form method="POST">
         {% for group in radio_groups %}
             <div class="prediction-group">
-                <p>{{ group.label }}</p>
+                <label class="form-label">
+                    <i class="bi bi-person-fill me-2"></i>{{ group.label }}
+                </label>
                 <div class="option-grid">
                     {% for value, display_label in group.options %}
                         <div class="option-tile">
                             <input type="radio" id="{{ group.name }}_{{ value }}" name="{{ group.name }}" value="{{ value }}">
                             <label for="{{ group.name }}_{{ value }}">{{ display_label }}</label>
+                            <div class="checkmark"></div>
                         </div>
                     {% endfor %}
                 </div>
             </div>
-            <hr>
         {% endfor %}
-        <p></p>
-        <button type="submit">Submit</button>
+        
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-tennis btn-lg">
+                <i class="bi bi-check-circle-fill me-2"></i>Submit Predictions
+            </button>
+        </div>
     </form>
+</div>
 {% endif %}
 
-<h2>Upcoming matches</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Round</th>
-            <th>Time</th>
-            <th>Match</th>
-            <th>Predicted</th>
-            <th>Points</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for pred in upcoming_predictions %}
-        <tr>
-            <td>{{ pred.match.round }}</td>
-            <td>{{ pred.match.startTime.strftime('%a %I:%M %p') }}</td>
-            <td>{{ pred.match.player1 }} vs {{ pred.match.player2 }}</td>
-            <td>{{ pred.player }}</td>
-            <td>{{ pred.match.get_player_price(pred.player) | round(2) }}</td>
-        </tr>
-        {% if not loop.last %}
-        <tr>
-            <td colspan="5"><hr></td>
-        </tr>
-        {% endif %}
-        {% endfor %}
-    </tbody>
-</table>
+<div class="mt-5">
+    <h2 class="h3 mb-4 text-center">
+        <i class="bi bi-calendar-event me-2"></i>Upcoming Matches
+    </h2>
+    
+    {% if upcoming_predictions %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th><i class="bi bi-layers me-1"></i>Round</th>
+                    <th><i class="bi bi-clock me-1"></i>Time</th>
+                    <th><i class="bi bi-people me-1"></i>Match</th>
+                    <th><i class="bi bi-target me-1"></i>Predicted</th>
+                    <th><i class="bi bi-star me-1"></i>Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pred in upcoming_predictions %}
+                <tr>
+                    <td>
+                        <span class="badge bg-success">{{ pred.match.round }}</span>
+                    </td>
+                    <td>
+                        <small class="text-muted">{{ pred.match.startTime.strftime('%a %I:%M %p') }}</small>
+                    </td>
+                    <td>
+                        <strong>{{ pred.match.player1 }}</strong> vs <strong>{{ pred.match.player2 }}</strong>
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark">{{ pred.player }}</span>
+                    </td>
+                    <td>
+                        <span class="fw-bold text-success">{{ pred.match.get_player_price(pred.player) | round(2) }}</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-calendar-x display-1 text-muted"></i>
+        <p class="lead text-muted mt-3">No upcoming matches with predictions</p>
+    </div>
+    {% endif %}
+</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Enhanced tile interaction
         const optionTiles = document.querySelectorAll('.option-tile');
 
         optionTiles.forEach(tile => {
@@ -66,22 +101,45 @@
                     radio.dispatchEvent(new Event('change'));
                 }
             });
+
+            // Add keyboard support
+            tile.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
         });
 
+        // Enhanced radio button change handling
         const radioButtons = document.querySelectorAll('input[type="radio"]');
         radioButtons.forEach(radio => {
             radio.addEventListener('change', function() {
                 const parentGrid = this.closest('.option-grid');
                 if (parentGrid) {
+                    // Remove selected class from all tiles in this grid
                     const optionTiles = parentGrid.querySelectorAll('.option-tile');
-                    optionTiles.forEach(tile => tile.classList.remove('selected'));
+                    optionTiles.forEach(tile => {
+                        tile.classList.remove('selected');
+                        tile.style.borderColor = '#dee2e6';
+                    });
 
+                    // Add selected class to the chosen tile
                     const parentTile = this.closest('.option-tile');
                     if (parentTile) {
                         parentTile.classList.add('selected');
+                        parentTile.style.borderColor = '#4CAF50';
                     }
                 }
             });
+        });
+
+        // Add fade-in animation to elements
+        const elementsToAnimate = document.querySelectorAll('.prediction-section, .table-responsive');
+        elementsToAnimate.forEach((element, index) => {
+            setTimeout(() => {
+                element.classList.add('fade-in-up');
+            }, index * 100);
         });
     });
 </script>

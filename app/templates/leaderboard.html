@@ -2,198 +2,232 @@
 
 {% block page_styles %}
 <style>
-.filter-buttons {
-    margin-bottom: 20px;
+/* Additional styles specific to leaderboard */
+.current-user-row {
+    background-color: rgba(76, 175, 80, 0.1) !important;
+    font-weight: 600;
 }
 
-.filter-section {
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
+.current-user-row:hover {
+    background-color: rgba(76, 175, 80, 0.15) !important;
 }
 
-.filter-section > span {
-    min-width: 60px; /* Fixed width for labels to align buttons */
-}
-
-.filter-buttons > div, .filter-section > div {
-    display: flex;
-    gap: 5px;
-}
-
-.filter-btn {
-    display: flex; /* Make it a flex container to center its content */
-    justify-content: center; /* Horizontally center content */
-    align-items: center; /* Vertically center content */
-
-    /* The magic for squares: */
-    aspect-ratio: 1 / 1; /* Makes the width and height maintain a 1:1 ratio */
-    
-    /* Control the overall size primarily via width OR height.
-       Since we're in a flex container, let's give it a reasonable base width. */
-    width: 40px; /* Adjust this base width as needed for your desired square size */
-
-    padding: 0; /* Remove internal padding, as flexbox and content will size it.
-                  If your content has a fixed size (e.g. a single digit), this works.
-                  If the content can vary, you might need min-width/min-height or
-                  re-evaluate if pure squares are always best. */
-    
-    text-decoration: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #f8f9fa;
-    color: #333;
-    transition: all 0.2s;
-    font-size: 1em; /* Base font size */
-    box-sizing: border-box; /* Good practice */
-}
-
-.filter-btn:hover {
-    background-color: #e9ecef;
-    text-decoration: none;
-}
-
-.filter-btn.active {
-    background-color: #5cb85c;
+.position-badge {
+    background: linear-gradient(135deg, var(--tennis-green) 0%, var(--tennis-light-green) 100%);
     color: white;
-    border-color: #4cae4c;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.875rem;
 }
 
-.current-filter {
-    margin-top: 10px;
-    font-style: italic;
-    color: #666;
-    font-size: 0.9em;
-}
-.profile-icon-small {
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    vertical-align: middle;
-    margin-right: 8px; /* This is the space you wanted */
+.current-user-position {
+    background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
 }
 
-/* --- Media Queries --- */
-@media screen and (max-width: 480px) {
-    .filter-btn {
-        /* Instead of fixed width, adjust padding or font-size */
-        padding: 6px 8px; /* Slightly less padding */
-        font-size: 0.9em; /* Smaller font size */
-        width: 30px; 
-    }
-    .profile-icon-small {
-        border-radius: 50%;
-        width: 12px;
-        height: 12px;
-        vertical-align: middle;
-        margin-right: 2px; /* This is the space you wanted */
-    }
+.stats-badge {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    color: #495057;
 }
 
-@media screen and (max-width: 360px) {
-    .filter-btn {
-        /* Even less padding and smaller font size for very small screens */
-        padding: 4px 6px;
-        font-size: 0.8em;
-        width: 30px; 
-    }
-    .filter-buttons > div, .filter-section > div {
-        gap: 3px; /* Reduce gap between buttons for very small screens */
-    }
-    .profile-icon-small {
-        border-radius: 50%;
-        width: 10px;
-        height: 10px;
-        vertical-align: middle;
-        margin-right: 0px; /* This is the space you wanted */
-    }
+.username-link {
+    text-decoration: none;
+    color: black;
+    font-weight: 500;
+    transition: color 0.3s ease;
 }
 
+.username-link:hover {
+    color: var(--tennis-light-green);
+    text-decoration: underline;
+}
 
+.tournament-title {
+    color: var(--tennis-green);
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+@media (max-width: 576px) {
+    .tournament-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stats-badge {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.4rem;
+    }
+    
+    .position-badge {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.4rem;
+    }
+}
 </style>
-
 {% endblock %}
 
 {% block content %}
-    <h1>{{currentTournament}} 2025</h1>
-    <div class="filter-buttons">       
-        <div class="filter-section">
-            <span style="font-weight: bold; margin-right: 10px;">Gender:</span>
-            <div>
-                <a href="{{ url_for('leaderboard', round=selected_round, gender='all') }}" 
-                   class="filter-btn {{ 'active' if selected_gender == 'all' or selected_gender is none else '' }}">
-                   All
-                </a>
-                <a href="{{ url_for('leaderboard', round=selected_round, gender='M') }}" 
-                   class="filter-btn {{ 'active' if selected_gender == 'M' else '' }}">
-                   M
-                </a>
-                <a href="{{ url_for('leaderboard', round=selected_round, gender='W') }}" 
-                   class="filter-btn {{ 'active' if selected_gender == 'W' else '' }}">
-                   W
-                </a>
+<div class="row">
+    <div class="col-12">
+        <h1 class="tournament-title">
+            <i class="bi bi-trophy-fill me-2"></i>
+            {{ currentTournament }} 2025
+        </h1>
+        
+        <!-- Filter Section -->
+        <div class="filter-buttons">
+            <div class="row mb-3">
+                <div class="col-12 col-md-6 mb-2 mb-md-0">
+                    <div class="d-flex align-items-center">
+                        <span class="fw-bold me-3">Gender:</span>
+                        <div class="btn-group" role="group" aria-label="Gender filter">
+                            <a href="{{ url_for('leaderboard', round=selected_round, gender='all') }}" 
+                               class="filter-btn {{ 'active' if selected_gender == 'all' or selected_gender is none else '' }}">
+                               All
+                            </a>
+                            <a href="{{ url_for('leaderboard', round=selected_round, gender='M') }}" 
+                               class="filter-btn {{ 'active' if selected_gender == 'M' else '' }}">
+                               M
+                            </a>
+                            <a href="{{ url_for('leaderboard', round=selected_round, gender='W') }}" 
+                               class="filter-btn {{ 'active' if selected_gender == 'W' else '' }}">
+                               W
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12 col-md-6">
+                    <div class="d-flex align-items-center">
+                        <span class="fw-bold me-3">Round:</span>
+                        <div class="btn-group flex-wrap" role="group" aria-label="Round filter">
+                            <a href="{{ url_for('leaderboard', round='all', gender=selected_gender) }}" 
+                               class="filter-btn {{ 'active' if selected_round == 'all' else '' }}">
+                               All
+                            </a>
+                            {% for round in available_rounds %}
+                                <a href="{{ url_for('leaderboard', round=round, gender=selected_gender) }}" 
+                                   class="filter-btn {{ 'active' if selected_round == round else '' }}">
+                                   {{ round }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="filter-section">
-            <span style="font-weight: bold; margin-right: 10px;">Round:</span>
-            <div>
-                <a href="{{ url_for('leaderboard', round='all', gender=selected_gender) }}" 
-                   class="filter-btn {{ 'active' if selected_round == 'all' else '' }}">
-                   All
-                </a>
-                {% for round in available_rounds %}
-                    <a href="{{ url_for('leaderboard', round=round, gender=selected_gender) }}" 
-                       class="filter-btn {{ 'active' if selected_round == round else '' }}">
-                       {{ round }}
-                    </a>
-                {% endfor %}
+
+        <!-- Leaderboard Table -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-center" style="width: 80px;">
+                            <i class="bi bi-hash"></i>
+                        </th>
+                        <th scope="col">
+                            <i class="bi bi-person-fill me-2"></i>Player
+                        </th>
+                        <th scope="col" class="text-center">
+                            <i class="bi bi-check-circle-fill me-1"></i>
+                            <span class="d-none d-sm-inline">Correct</span>
+                            <span class="d-sm-none">✓</span>
+                        </th>
+                        <th scope="col" class="text-center">
+                            <i class="bi bi-star-fill me-1"></i>Points
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for userId, username, profile_image, points, numCorrect, predCount in userResults %}
+                    <tr class="{{ 'current-user-row' if current_user.id == userId else '' }}">
+                        <td class="text-center">
+                            <span class="position-badge {{ 'current-user-position' if current_user.id == userId else '' }}">
+                                {{ loop.index }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if profile_image %}
+                                    <img src="{{ url_for('static', filename='images/' + profile_image) }}" 
+                                         alt="{{ username }}'s profile" 
+                                         class="profile-image-small me-2">
+                                {% else %}
+                                    <img src="/static/images/a tennis ball logo.png" 
+                                         alt="Default profile" 
+                                         class="profile-image-small me-2">
+                                {% endif %}
+                                <a href="{{ url_for('user', username=username) }}" class="username-link">
+                                    {{ username }}
+                                </a>
+                                {% if current_user.id == userId %}
+                                    <span class="badge bg-warning text-dark ms-2 d-none d-sm-inline">You</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <span class="stats-badge">
+                                {{ numCorrect }}
+                                <span class="d-none d-md-inline">/ {{ predCount }}</span>
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="fw-bold" style="color: #495057;">
+                                {{ points|round(1) }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if not userResults %}
+        <div class="text-center py-5">
+            <div class="mb-3">
+                <i class="bi bi-info-circle display-1 text-muted"></i>
+            </div>
+            <h4 class="text-muted">No results found</h4>
+            <p class="text-muted">Try adjusting your filters or check back later.</p>
+        </div>
+        {% endif %}
+
+        <!-- Stats Summary -->
+        {% if userResults %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card bg-light border-0">
+                    <div class="card-body text-center">
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="h5 mb-0 text-success">{{ userResults|length }}</div>
+                                <small class="text-muted">Total Players</small>
+                            </div>
+                            <div class="col-4">
+                                <div class="h5 mb-0 text-success">
+                                    {{ available_rounds|length if available_rounds else 0 }}
+                                </div>
+                                <small class="text-muted">Rounds</small>
+                            </div>
+                            <div class="col-4">
+                                <div class="h5 mb-0 text-success">
+                                    {% set total_predictions = userResults|sum(attribute=5) if userResults else 0 %}
+                                    {{ total_predictions }}
+                                </div>
+                                <small class="text-muted">Total Predictions</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        {% endif %}
     </div>
-    <table>
-        <thead>
-            <tr>
-                <th></th>
-                <th>Position</th>
-                <th>Correct Predictions</th>
-                <th>Points</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for userId, username, profile_image, points, numCorrect, predCount in userResults %}
-            <tr>
-                {% if current_user.id == userId %}
-                    <td class="text-bold" style="text-align: left;">
-                        {% if profile_image %}
-                        <img src="{{ url_for('static', filename='images/' + profile_image) }}" alt="{{ username }}'s image" class="profile-icon-small">
-                        {% else %}
-                        <img src="/static/images/a tennis ball logo.png" alt="{{ username }}'s image" class="profile-icon-small">
-                        {% endif %}
-                        <a href="{{ url_for('user', username=username) }}">{{username}}</a>
-                    </td>
-                    <td class="text-bold">{{ loop.index }}</td>
-                    <td class="text-bold">{{ numCorrect }}</td>
-                    <td class="text-bold">{{ points|round(1)}}</td>
-                {% else %}
-                    <td style="text-align: left;">
-                        {% if profile_image %}
-                        <img src="{{ url_for('static', filename='images/' + profile_image) }}" alt="{{ username }}'s class="profile-icon-small">
-                        {% else %}
-                        <img src="/static/images/a tennis ball logo.png" alt="{{ username }}'s image" class="profile-icon-small">
-                        {% endif %}
-                        <a href="{{ url_for('user', username=username) }}">{{username}}</a>
-                    </td>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ numCorrect }}</td>
-                    <td>{{ points|round(1) }}</td>
-                {% endif %}
-            </tr>
-            {% if not loop.last %}
-            <tr>
-                <td colspan="4"><hr></td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-        </tbody>
-    </table>
+</div>
 {% endblock %}
